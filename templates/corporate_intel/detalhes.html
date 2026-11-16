@@ -44,19 +44,18 @@
     </div>
 </div>
 
-<!-- TEXTO PRONTO PARA COPIAR E ENVIAR PARA A EQUIPE (COM PARECER DA IA DO GOOGLE) -->
+<!-- TEXTO PRONTO PARA COPIAR E ENVIAR PARA A EQUIPE (COMPLIANCE / APROVAÇÃO) -->
 <div class="glass-card rounded-3xl p-7 mb-8 shadow-2xl border border-purple-500/30 bg-purple-950/15">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
         <div class="flex items-center space-x-3">
             <div class="p-3 rounded-2xl bg-purple-500/20 text-purple-400 border border-purple-500/30 text-xl">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <i class="fa-solid fa-copy"></i>
             </div>
             <div>
                 <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                    <span>Mensagem Pronta com Google Gemini AI</span>
-                    <span class="text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-md">Powered by Google GenAI</span>
+                    <span>Mensagem Pronta para Aprovação de Transação</span>
                 </h3>
-                <p class="text-xs text-slate-400">Resumo executivo gerado por inteligência artificial para envio no canal de aprovação:</p>
+                <p class="text-xs text-slate-400">Resumo executivo gerado para envio no canal de aprovação da equipe:</p>
             </div>
         </div>
         <button onclick="copiarTextoMensagem()" id="btnCopiar" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-lg shadow-purple-600/30 whitespace-nowrap active:scale-95">
@@ -76,7 +75,7 @@ Situacao Receita: {{ empresa.situacao|default:"N/D" }}
 STATUS DE RISCO / FRAUDE: {{ empresa.risk_level }} (Score: {{ empresa.risk_score }}/100)
 Gateways Detectados: {% for gw in empresa.metodos_pagamento %}{{ gw }}{% if not forloop.last %}, {% endif %}{% empty %}Nenhum identificado{% endfor %}
 
-PARECER DO AGENTE DE IA DO GOOGLE (GEMINI):
+PARECER DE SEGURANÇA PARA APROVAÇÃO:
 {{ empresa.compliance_processos.parecer_ia }}</textarea>
     </div>
 </div>
