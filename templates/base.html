@@ -27,11 +27,11 @@
 <body class="h-full flex overflow-hidden">
 
     {% if user.is_authenticated %}
-    <!-- Sidebar (Exibida apenas quando logado) -->
+    <!-- Sidebar (Com Status em Tempo Real das 5 APIs) -->
     <aside class="w-72 bg-[#12131a] border-r border-white/5 flex flex-col justify-between hidden lg:flex p-6 shrink-0 shadow-2xl">
         <div>
             <!-- Logo / Brand -->
-            <div class="flex items-center space-x-3 mb-10 px-2">
+            <div class="flex items-center space-x-3 mb-8 px-2">
                 <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-violet-600 to-fuchsia-500 flex items-center justify-center text-white shadow-lg shadow-purple-900/40">
                     <i class="fa-solid fa-shield-halved text-lg"></i>
                 </div>
@@ -42,7 +42,7 @@
             </div>
 
             <!-- Navigation Links -->
-            <nav class="space-y-2">
+            <nav class="space-y-2 mb-6">
                 <a href="{% url 'dashboard' %}" class="flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl text-sm font-semibold transition {% if request.resolver_match.url_name == 'dashboard' %}sidebar-item-active text-white shadow-inner{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
                     <i class="fa-solid fa-chart-pie text-base text-purple-400"></i>
                     <span>Dashboard Principal</span>
@@ -52,6 +52,19 @@
                     <span>Histórico de Auditorias</span>
                 </a>
             </nav>
+
+            <!-- Real-Time API Health Monitor Widget -->
+            <div class="bg-black/30 border border-white/5 rounded-2xl p-4 shadow-inner">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-[11px] uppercase font-bold text-slate-400 tracking-wider">Status das 5 APIs (CNPJ)</span>
+                    <button onclick="carregarStatusAPIs()" title="Atualizar Status" class="text-xs text-purple-400 hover:text-purple-300 transition">
+                        <i class="fa-solid fa-rotate" id="iconeRefresh"></i>
+                    </button>
+                </div>
+                <div id="listaApiStatus" class="space-y-2">
+                    <div class="text-xs text-slate-500 italic py-2 text-center">Verificando conexões...</div>
+                </div>
+            </div>
         </div>
 
         <!-- Logout / Footer inside Sidebar -->
@@ -69,6 +82,56 @@
             </div>
         </div>
     </aside>
+
+    <script>
+    async function carregarStatusAPIs() {
+        const container = document.getElementById('listaApiStatus');
+        const icone = document.getElementById('iconeRefresh');
+        if (icone) icone.classList.add('fa-spin');
+
+        try {
+            const response = await fetch("{% url 'api_status_check' %}");
+            const data = await response.json();
+
+            let html = '';
+            data.apis.forEach(api => {
+                let corDot = 'bg-emerald-400';
+                let textoStatus = 'Online';
+                let corTexto = 'text-emerald-300';
+
+                if (api.status === 'rate-limit') {
+                    corDot = 'bg-amber-400';
+                    textoStatus = 'Rate Limit';
+                    corTexto = 'text-amber-300';
+                } else if (api.status === 'offline') {
+                    corDot = 'bg-red-500';
+                    textoStatus = 'Offline';
+                    corTexto = 'text-red-400';
+                }
+
+                html += `
+                    <div class="flex items-center justify-between text-xs bg-white/5 px-3 py-2 rounded-xl border border-white/5">
+                        <span class="font-medium text-slate-300">${api.nome}</span>
+                        <div class="flex items-center space-x-1.5">
+                            <span class="w-2 h-2 rounded-full ${corDot} animate-pulse"></span>
+                            <span class="${corTexto} text-[10px] font-bold">${textoStatus}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        } catch (e) {
+            container.innerHTML = `<div class="text-xs text-red-400 py-1 text-center">Erro ao checar status</div>`;
+        } finally {
+            if (icone) icone.classList.remove('fa-spin');
+        }
+    }
+
+    // Carrega ao abrir a página
+    document.addEventListener("DOMContentLoaded", carregarStatusAPIs);
+    // Atualiza a cada 60 segundos automaticamente
+    setInterval(carregarStatusAPIs, 60000);
+    </script>
     {% endif %}
 
     <!-- Main Wrapper -->
