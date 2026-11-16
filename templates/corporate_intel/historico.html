@@ -1,0 +1,63 @@
+{% extends 'corporate_intel/base.html' %}
+
+{% block title %}Histórico de Consultas • CorpGuard Intelligence{% endblock %}
+
+{% block content %}
+<div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-xl overflow-hidden mb-8">
+    <div class="px-6 py-6 border-b border-slate-700 flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-white"><i class="fa-solid fa-history mr-2 text-blue-400"></i> Histórico Completo de Consultas</h1>
+            <p class="text-xs text-slate-400 mt-1">Todas as consultas de CNPJ, análises de fraude e processos armazenadas no banco de dados.</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition">
+            <i class="fa-solid fa-plus mr-1"></i> Nova Consulta
+        </a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-slate-900/60 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-700">
+                    <th class="py-4 px-6">CNPJ / Razão Social</th>
+                    <th class="py-4 px-6">Municipio/UF</th>
+                    <th class="py-4 px-6">Data Consulta</th>
+                    <th class="py-4 px-6">Nível de Risco</th>
+                    <th class="py-4 px-6 text-right">Ação</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-700 text-sm">
+                {% for emp in empresas %}
+                <tr class="hover:bg-slate-750 transition">
+                    <td class="py-4 px-6">
+                        <span class="font-mono font-semibold text-white block">{{ emp.cnpj }}</span>
+                        <span class="text-xs text-slate-400">{{ emp.razao_social|default:"Sem Razão Social" }}</span>
+                    </td>
+                    <td class="py-4 px-6 text-slate-300">
+                        {{ emp.municipio|default:"--" }} / {{ emp.uf|default:"--" }}
+                    </td>
+                    <td class="py-4 px-6 text-slate-400 text-xs font-mono">
+                        {{ emp.criado_em|date:"d/m/Y H:i" }}
+                    </td>
+                    <td class="py-4 px-6">
+                        <span class="px-3 py-1 text-xs rounded-full font-bold {% if emp.risk_level == 'ALTO' %}bg-red-600 text-white{% elif emp.risk_level == 'MÉDIO' %}bg-amber-500 text-slate-950{% else %}bg-emerald-600 text-white{% endif %}">
+                            {{ emp.risk_level }} ({{ emp.risk_score }})
+                        </span>
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                        <a href="{% url 'detalhes_empresa' emp.pk %}" class="bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition border border-blue-500/30">
+                            Ver Relatório
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="py-12 text-center text-slate-500">
+                        Nenhuma consulta registrada no histórico.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

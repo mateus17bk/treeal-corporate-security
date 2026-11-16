@@ -1,0 +1,135 @@
+{% extends 'corporate_intel/base.html' %}
+
+{% block title %}Dashboard • CorpGuard Intelligence{% endblock %}
+
+{% block content %}
+<!-- Header Search & Action -->
+<div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 mb-8 shadow-xl">
+    <div class="max-w-3xl">
+        <h1 class="text-3xl font-bold text-white mb-2">Consulta Inteligente de CNPJ & Due Diligence</h1>
+        <p class="text-slate-400 mb-6">Informe o CNPJ da empresa para realizar varredura cadastral, detecção de métodos de pagamento, análise de fraudes e processos judiciais.</p>
+
+        <form action="{% url 'consultar_cnpj' %}" method="POST" class="flex flex-col sm:flex-row gap-3">
+            {% csrf_token %}
+            <div class="relative flex-grow">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                    <i class="fa-solid fa-building-columns"></i>
+                </span>
+                <input type="text" name="cnpj" placeholder="Digite o CNPJ (ex: 00.000.000/0001-00 ou só números)" required
+                    class="w-full pl-11 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono text-lg">
+            </div>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-semibold transition flex items-center justify-center space-x-2 shadow-lg shadow-blue-600/30">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Investigar Empresa</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Stats Overview -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-md flex items-center justify-between">
+        <div>
+            <p class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Total Consultas</p>
+            <h3 class="text-3xl font-extrabold text-white mt-1">{{ total_consultas }}</h3>
+        </div>
+        <div class="bg-blue-500/10 text-blue-400 p-4 rounded-xl border border-blue-500/20 text-xl">
+            <i class="fa-solid fa-database"></i>
+        </div>
+    </div>
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-md flex items-center justify-between">
+        <div>
+            <p class="text-xs uppercase tracking-wider text-red-400 font-semibold">Risco Alto / Fraude</p>
+            <h3 class="text-3xl font-extrabold text-red-400 mt-1">{{ risco_alto }}</h3>
+        </div>
+        <div class="bg-red-500/10 text-red-400 p-4 rounded-xl border border-red-500/20 text-xl">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+    </div>
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-md flex items-center justify-between">
+        <div>
+            <p class="text-xs uppercase tracking-wider text-amber-400 font-semibold">Risco Médio / Processos</p>
+            <h3 class="text-3xl font-extrabold text-amber-400 mt-1">{{ risco_medio }}</h3>
+        </div>
+        <div class="bg-amber-500/10 text-amber-400 p-4 rounded-xl border border-amber-500/20 text-xl">
+            <i class="fa-solid fa-scale-balanced"></i>
+        </div>
+    </div>
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-md flex items-center justify-between">
+        <div>
+            <p class="text-xs uppercase tracking-wider text-emerald-400 font-semibold">Risco Baixo / Confiável</p>
+            <h3 class="text-3xl font-extrabold text-emerald-400 mt-1">{{ risco_baixo }}</h3>
+        </div>
+        <div class="bg-emerald-500/10 text-emerald-400 p-4 rounded-xl border border-emerald-500/20 text-xl">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Queries Table -->
+<div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-xl overflow-hidden">
+    <div class="px-6 py-5 border-b border-slate-700 flex justify-between items-center">
+        <h3 class="font-bold text-lg text-white"><i class="fa-solid fa-clock-rotate-left mr-2 text-blue-400"></i> Consultas Recentes</h3>
+        <a href="{% url 'historico' %}" class="text-sm text-blue-400 hover:underline font-medium">Ver todas &rarr;</a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-slate-900/60 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-700">
+                    <th class="py-4 px-6">CNPJ / Razão Social</th>
+                    <th class="py-4 px-6">Localidade</th>
+                    <th class="py-4 px-6">Situação</th>
+                    <th class="py-4 px-6">Nível de Risco</th>
+                    <th class="py-4 px-6">Gateways / Pix</th>
+                    <th class="py-4 px-6 text-right">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-700 text-sm">
+                {% for emp in empresas %}
+                <tr class="hover:bg-slate-750 transition">
+                    <td class="py-4 px-6">
+                        <span class="font-mono font-semibold text-white block">{{ emp.cnpj }}</span>
+                        <span class="text-xs text-slate-400">{{ emp.razao_social|truncatechars:45 }}</span>
+                    </td>
+                    <td class="py-4 px-6 text-slate-300">
+                        {{ emp.municipio|default:"N/D" }} / {{ emp.uf|default:"--" }}
+                    </td>
+                    <td class="py-4 px-6">
+                        <span class="px-2.5 py-1 text-xs rounded-full font-medium {% if emp.situacao == 'ATIVA' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% else %}bg-red-500/10 text-red-400 border border-red-500/20{% endif %}">
+                            {{ emp.situacao|default:"DESCONHECIDA" }}
+                        </span>
+                    </td>
+                    <td class="py-4 px-6">
+                        <span class="px-3 py-1 text-xs rounded-full font-bold {% if emp.risk_level == 'ALTO' %}bg-red-600 text-white shadow-md shadow-red-600/30{% elif emp.risk_level == 'MÉDIO' %}bg-amber-500 text-slate-950 font-extrabold{% else %}bg-emerald-600 text-white{% endif %}">
+                            {{ emp.risk_level }} ({{ emp.risk_score }}pts)
+                        </span>
+                    </td>
+                    <td class="py-4 px-6">
+                        <div class="flex flex-wrap gap-1">
+                            {% for gw in emp.metodos_pagamento %}
+                            <span class="bg-slate-900 border border-slate-700 text-xs px-2 py-0.5 rounded text-blue-300">{{ gw }}</span>
+                            {% empty %}
+                            <span class="text-xs text-slate-500">Nenhum detectado</span>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                        <a href="{% url 'detalhes_empresa' emp.pk %}" class="bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition border border-blue-500/30">
+                            <i class="fa-solid fa-eye mr-1"></i> Relatório
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="py-12 text-center text-slate-500">
+                        <i class="fa-solid fa-folder-open text-4xl mb-3 block opacity-40"></i>
+                        Nenhuma empresa consultada até o momento. Digite um CNPJ acima para iniciar a investigação.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
