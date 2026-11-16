@@ -1,3 +1,7 @@
+"""
+Django settings for corporate security and CNPJ intelligence platform.
+"""
+
 from pathlib import Path
 import os
 
@@ -70,3 +74,8 @@ STATIC_DIR.mkdir(exist_ok=True)
 STATICFILES_DIRS = [STATIC_DIR]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Configuração de Redirecionamento Pós-Login
+LOGIN_REDIRECT_URL = 'dashboard'
+LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = 'login'
