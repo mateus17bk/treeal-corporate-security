@@ -3,95 +3,100 @@
 {% block title %}Dashboard • CorpGuard Intelligence{% endblock %}
 
 {% block content %}
-<!-- Welcome & Hero Overview (Dark Fintech Style) -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+<!-- Google Stitch / Glassmorphism Hero Section -->
+<div class="relative bg-gradient-to-br from-slate-900/90 via-purple-950/30 to-slate-950/90 border border-white/10 rounded-3xl p-8 md:p-14 mb-10 shadow-2xl overflow-hidden backdrop-blur-2xl">
+    <!-- Ambient Glows -->
+    <div class="absolute -left-20 -top-20 w-80 h-80 bg-purple-600/15 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none"></div>
 
-    <!-- Left 2 Cols: Welcome & Search Card -->
-    <div class="lg:col-span-2 glass-card rounded-3xl p-8 relative overflow-hidden flex flex-col justify-between shadow-2xl">
-        <div class="absolute -right-20 -bottom-20 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div>
-            <div class="flex items-center space-x-2 text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">
-                <i class="fa-solid fa-sparkles"></i>
-                <span>Visão Geral do Sistema</span>
-            </div>
-            <h1 class="text-3xl font-extrabold text-white tracking-tight mb-2">Bem-vindo, Mateus.</h1>
-            <p class="text-slate-400 text-sm mb-6 leading-relaxed">
-                Insira o CNPJ da empresa desejada para executar o cruzamento multi-API, verificação de sanções federais (CEIS/CNEP) e análise de pagamentos.
-            </p>
+    <div class="max-w-3xl relative z-10 mx-auto text-center">
+        <div class="inline-flex items-center space-x-2.5 bg-purple-500/10 border border-purple-500/30 text-purple-300 px-4.5 py-2 rounded-full text-xs font-bold mb-6 tracking-wider uppercase shadow-inner">
+            <span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
+            <span>Google Stitch &bull; Intelligent Data Fusion</span>
         </div>
 
-        <!-- Search Bar Inside Hero -->
-        <form action="{% url 'consultar_cnpj' %}" method="POST" class="bg-black/40 border border-white/10 p-2 rounded-2xl flex flex-col sm:flex-row gap-2 shadow-inner">
-            {% csrf_token %}
-            <div class="relative flex-grow">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-purple-400">
-                    <i class="fa-solid fa-building-shield"></i>
-                </span>
-                <input type="text" name="cnpj" placeholder="Digite o CNPJ (ex: 60.701.190/0001-04)" required
-                    class="w-full pl-12 pr-4 py-3.5 bg-transparent border-0 text-white placeholder-slate-500 focus:outline-none focus:ring-0 font-mono text-sm">
-            </div>
-            <button type="submit" class="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white px-6 py-3.5 rounded-xl font-bold text-sm transition flex items-center justify-center space-x-2 shadow-lg shadow-purple-600/30 whitespace-nowrap active:scale-95">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <span>Investigar CNPJ</span>
-            </button>
-        </form>
-    </div>
+        <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight mb-5 leading-tight">
+            Inteligência de CNPJ & Due Diligence <br class="hidden sm:inline">
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-fuchsia-300 to-indigo-400">Com Interface Translúcida Avançada</span>
+        </h1>
 
-    <!-- Right Col: Quick Stats Tile -->
-    <div class="glass-card rounded-3xl p-8 shadow-2xl flex flex-col justify-between">
-        <div class="flex justify-between items-center mb-4">
-            <span class="text-xs uppercase tracking-wider text-slate-400 font-bold">Total Investigado</span>
-            <div class="p-3 rounded-2xl bg-purple-500/10 text-purple-400 border border-purple-500/20 text-lg">
-                <i class="fa-solid fa-database"></i>
-            </div>
+        <p class="text-slate-300 text-base md:text-lg mb-10 leading-relaxed max-w-2xl mx-auto font-normal">
+            Cruzamento unificado de dados cadastrais, sanções federais (CEIS/CNEP), processos judiciais e rastreamento de meios de pagamento.
+        </p>
+
+        <!-- Glassmorphism Search Bar -->
+        <div class="bg-black/50 border border-white/10 p-2.5 rounded-2xl shadow-2xl max-w-2xl mx-auto backdrop-blur-xl">
+            <form action="{% url 'consultar_cnpj' %}" method="POST" class="flex flex-col sm:flex-row gap-2">
+                {% csrf_token %}
+                <div class="relative flex-grow">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-purple-400">
+                        <i class="fa-solid fa-fingerprint"></i>
+                    </span>
+                    <input type="text" name="cnpj" placeholder="Digite o CNPJ (ex: 60.701.190/0001-04)" required
+                        class="w-full pl-12 pr-4 py-4 bg-transparent border-0 text-white placeholder-slate-500 focus:outline-none focus:ring-0 font-mono text-base">
+                </div>
+                <button type="submit" class="bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white px-8 py-4 rounded-xl font-bold transition flex items-center justify-center space-x-2 shadow-lg shadow-purple-600/30 whitespace-nowrap active:scale-95">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>Executar Auditoria</span>
+                </button>
+            </form>
         </div>
-        <div>
-            <h3 class="text-4xl font-extrabold text-white font-mono tracking-tight">{{ total_consultas }}</h3>
-            <p class="text-xs text-slate-400 mt-1">Empresas cadastradas no banco de auditoria</p>
-        </div>
-        <div class="mt-6 pt-4 border-t border-white/5 flex justify-between text-xs text-slate-400">
-            <span>Risco Alto: <strong class="text-red-400">{{ risco_alto }}</strong></span>
-            <span>Risco Médio: <strong class="text-amber-400">{{ risco_medio }}</strong></span>
-            <span>Seguros: <strong class="text-emerald-400">{{ risco_baixo }}</strong></span>
+
+        <div class="flex flex-wrap justify-center items-center gap-6 mt-8 text-xs text-slate-400 font-medium">
+            <span class="flex items-center space-x-1.5"><i class="fa-solid fa-shield text-purple-400"></i><span>Multi-API Receita Federal</span></span>
+            <span class="flex items-center space-x-1.5"><i class="fa-solid fa-shield text-purple-400"></i><span>Portal da Transparência (CGU)</span></span>
+            <span class="flex items-center space-x-1.5"><i class="fa-solid fa-shield text-purple-400"></i><span>OSINT & Varredura Pix</span></span>
         </div>
     </div>
-
 </div>
 
-<!-- Risk Metrics Ribbon -->
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-    <div class="glass-card rounded-2xl p-6 shadow-xl flex items-center justify-between">
+<!-- Glassmorphism Metrics Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+    <div class="glass-card rounded-2xl p-6 shadow-xl flex items-center justify-between hover:border-white/20 transition">
+        <div>
+            <p class="text-xs uppercase tracking-wider text-slate-400 font-bold">Total Consultas</p>
+            <h3 class="text-3xl font-extrabold text-white mt-1 font-mono">{{ total_consultas }}</h3>
+            <p class="text-xs text-purple-400 mt-1 font-medium">Empresas auditadas</p>
+        </div>
+        <div class="bg-purple-500/10 text-purple-400 p-4 rounded-2xl border border-purple-500/20 text-xl">
+            <i class="fa-solid fa-database"></i>
+        </div>
+    </div>
+    <div class="glass-card rounded-2xl p-6 shadow-xl flex items-center justify-between hover:border-white/20 transition">
         <div>
             <p class="text-xs uppercase tracking-wider text-red-400 font-bold">Risco Alto / Sanções</p>
-            <h3 class="text-2xl font-extrabold text-white mt-1">{{ risco_alto }}</h3>
+            <h3 class="text-3xl font-extrabold text-red-400 mt-1 font-mono">{{ risco_alto }}</h3>
+            <p class="text-xs text-red-400 mt-1 font-medium">Requer bloqueio</p>
         </div>
-        <div class="bg-red-500/10 text-red-400 p-3.5 rounded-xl border border-red-500/20 text-base">
+        <div class="bg-red-500/10 text-red-400 p-4 rounded-2xl border border-red-500/20 text-xl">
             <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
     </div>
-    <div class="glass-card rounded-2xl p-6 shadow-xl flex items-center justify-between">
+    <div class="glass-card rounded-2xl p-6 shadow-xl flex items-center justify-between hover:border-white/20 transition">
         <div>
             <p class="text-xs uppercase tracking-wider text-amber-400 font-bold">Risco Médio</p>
-            <h3 class="text-2xl font-extrabold text-white mt-1">{{ risco_medio }}</h3>
+            <h3 class="text-3xl font-extrabold text-amber-400 mt-1 font-mono">{{ risco_medio }}</h3>
+            <p class="text-xs text-amber-400 mt-1 font-medium">Com ressalvas</p>
         </div>
-        <div class="bg-amber-500/10 text-amber-400 p-3.5 rounded-xl border border-amber-500/20 text-base">
+        <div class="bg-amber-500/10 text-amber-400 p-4 rounded-2xl border border-amber-500/20 text-xl">
             <i class="fa-solid fa-scale-balanced"></i>
         </div>
     </div>
-    <div class="glass-card rounded-2xl p-6 shadow-xl flex items-center justify-between">
+    <div class="glass-card rounded-2xl p-6 shadow-xl flex items-center justify-between hover:border-white/20 transition">
         <div>
             <p class="text-xs uppercase tracking-wider text-emerald-400 font-bold">Risco Baixo / Seguro</p>
-            <h3 class="text-2xl font-extrabold text-white mt-1">{{ risco_baixo }}</h3>
+            <h3 class="text-3xl font-extrabold text-emerald-400 mt-1 font-mono">{{ risco_baixo }}</h3>
+            <p class="text-xs text-emerald-400 mt-1 font-medium">Operação regular</p>
         </div>
-        <div class="bg-emerald-500/10 text-emerald-400 p-3.5 rounded-xl border border-emerald-500/20 text-base">
+        <div class="bg-emerald-500/10 text-emerald-400 p-4 rounded-2xl border border-emerald-500/20 text-xl">
             <i class="fa-solid fa-circle-check"></i>
         </div>
     </div>
 </div>
 
-<!-- Recent Queries Table (Dark Fintech Watchlist Style) -->
+<!-- Glassmorphism Table Section -->
 <div class="glass-card rounded-3xl shadow-2xl overflow-hidden mb-12">
-    <div class="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-black/20">
+    <div class="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-black/30 backdrop-blur-md">
         <div class="flex items-center space-x-3">
             <div class="w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse"></div>
             <h3 class="font-bold text-base text-white">Watchlist & Auditorias Recentes</h3>
@@ -111,7 +116,7 @@
                     <th class="py-4 px-6 font-semibold">Situação</th>
                     <th class="py-4 px-6 font-semibold">Classificação de Risco</th>
                     <th class="py-4 px-6 font-semibold">Métodos de Pagamento</th>
-                    <th class="py-4 px-8 font-semibold text-right">Ação</th>
+                    <th class="py-4 px-8 font-semibold text-right">Relatório</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-white/5 text-sm">
@@ -146,6 +151,7 @@
                     </td>
                     <td class="py-4 px-8 text-right">
                         <a href="{% url 'detalhes_empresa' emp.pk %}" class="bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition border border-purple-500/30 inline-flex items-center space-x-1.5 shadow-sm">
+                            <i class="fa-solid fa-file-lines"></i>
                             <span>Dossiê</span>
                         </a>
                     </td>
