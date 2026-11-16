@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.views import LoginView
 from .models import EmpresaConsulta
 from .services import CNPJIntelligenceService
 
@@ -76,3 +77,7 @@ def registrar_usuario_view(request):
 
     context = {'form': form}
     return render(request, 'corporate_intel/register.html', context)
+
+class CustomLoginView(LoginView):
+    template_name = 'corporate_intel/login.html'
+    redirect_authenticated_user = True

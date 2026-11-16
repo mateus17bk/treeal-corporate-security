@@ -7,4 +7,5 @@ urlpatterns = [
     path('empresa/<int:pk>/', views.detalhes_empresa_view, name='detalhes_empresa'),
     path('historico/', views.historico_view, name='historico'),
     path('cadastro/', views.registrar_usuario_view, name='register'),
+    path('login/', views.CustomLoginView.as_view(), name='login'),
 ]

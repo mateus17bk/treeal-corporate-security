@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Entrar • Treeal DS{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-10">
+    <div class="glass-card rounded-3xl p-8 shadow-2xl border border-white/10">
+        <div class="text-center mb-8">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-white text-2xl mx-auto mb-4 shadow-lg shadow-purple-600/30">
+                <i class="fa-solid fa-right-to-bracket"></i>
+            </div>
+            <h1 class="text-2xl font-extrabold text-white tracking-tight">Acessar Plataforma</h1>
+            <p class="text-xs text-slate-400 mt-1">Entre com sua conta de operador</p>
+        </div>
+
+        {% if form.errors %}
+        <div class="p-3 mb-4 rounded-xl bg-red-950/80 border border-red-800 text-red-200 text-xs">
+            Usuário ou senha incorretos. Tente novamente.
+        </div>
+        {% endif %}
+
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div>
+                <label class="block text-xs uppercase font-bold text-slate-300 mb-1.5">{{ field.label }}</label>
+                {{ field }}
+                {% for error in field.errors %}
+                <p class="text-xs text-red-400 mt-1">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white py-3.5 rounded-xl font-bold text-sm transition shadow-lg shadow-purple-600/30 mt-6 active:scale-95">
+                Entrar no Sistema
+            </button>
+        </form>
+
+        <div class="mt-6 text-center text-xs text-slate-400">
+            <span>Não tem uma conta? </span>
+            <a href="{% url 'register' %}" class="text-purple-400 hover:underline font-semibold">Cadastre-se aqui</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    input[type="text"], input[type="password"] {
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        color: #ffffff;
+        font-size: 0.875rem;
+        outline: none;
+        transition: all 0.2s;
+    }
+    input[type="text"]:focus, input[type="password"]:focus {
+        border-color: #a855f7;
+        box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+    }
+</style>
+{% endblock %}
