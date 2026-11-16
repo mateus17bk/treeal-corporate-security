@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
 from .models import EmpresaConsulta
 from .services import CNPJIntelligenceService
 
@@ -9,18 +11,15 @@ def dashboard_view(request):
     empresas = EmpresaConsulta.objects.all().order_by('-criado_em')
 
     if query:
-        empresas = empresas.filter(
-            models_q_cnpj_or_name(query)
-        ) if hasattr(empresas, 'filter') else empresas
+        empresas = empresas.filter(models_q_cnpj_or_name(query))
 
-    # Estatísticas
     total_consultas = EmpresaConsulta.objects.count()
     risco_alto = EmpresaConsulta.objects.filter(risk_level='ALTO').count()
     risco_medio = EmpresaConsulta.objects.filter(risk_level='MÉDIO').count()
     risco_baixo = EmpresaConsulta.objects.filter(risk_level='BAIXO').count()
 
     context = {
-        'empresas': empresas[:20], # Últimas 20
+        'empresas': empresas[:20],
         'total_consultas': total_consultas,
         'risco_alto': risco_alto,
         'risco_medio': risco_medio,
@@ -60,3 +59,20 @@ def historico_view(request):
         'empresas': empresas
     }
     return render(request, 'corporate_intel/historico.html', context)
+
+def registrar_usuario_view(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Conta criada com sucesso! Bem-vindo à plataforma.")
+            return redirect('dashboard')
+        else:
+            for error in form.errors.values():
+                messages.error(request, error)
+    else:
+        form = UserCreationForm()
+
+    context = {'form': form}
+    return render(request, 'corporate_intel/register.html', context)
