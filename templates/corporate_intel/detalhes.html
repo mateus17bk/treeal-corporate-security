@@ -44,6 +44,59 @@
     </div>
 </div>
 
+<!-- TEXTO PRONTO PARA COPIAR E ENVIAR PARA A EQUIPE (COMPLIANCE / APROVAÇÃO) -->
+<div class="glass-card rounded-3xl p-7 mb-8 shadow-2xl border border-purple-500/30 bg-purple-950/10">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+        <div class="flex items-center space-x-3">
+            <div class="p-3 rounded-2xl bg-purple-500/20 text-purple-400 border border-purple-500/30 text-xl">
+                <i class="fa-solid fa-copy"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-white">Mensagem Pronta para Aprovação de Transação</h3>
+                <p class="text-xs text-slate-400">Copie o resumo executivo abaixo para enviar no chat da equipe (Slack/Discord/Teams) solicitando liberação do pagamento:</p>
+            </div>
+        </div>
+        <button onclick="copiarTextoMensagem()" id="btnCopiar" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-lg shadow-purple-600/30 whitespace-nowrap active:scale-95">
+            <i class="fa-solid fa-clone"></i>
+            <span id="textoBotaoCopiar">Copiar Mensagem</span>
+        </button>
+    </div>
+
+    <div class="relative">
+        <textarea id="textoCopiaEquipe" readonly rows="7" class="w-full bg-slate-950 border border-white/10 rounded-2xl p-4 text-xs font-mono text-slate-200 focus:outline-none resize-none shadow-inner">🚨 *RELATÓRIO DE DUE DILIGENCE & COMPLIANCE - TREEAL* 🚨
+
+📋 *Empresa:* {{ empresa.razao_social|default:"N/D" }}
+🏢 *CNPJ:* {{ empresa.cnpj }}
+📍 *Localidade:* {{ empresa.municipio|default:"N/D" }} / {{ empresa.uf|default:"--" }}
+📌 *Situação Receita:* {{ empresa.situacao|default:"N/D" }}
+
+🛡️ *STATUS DE RISCO / FRAUDE:* *{{ empresa.risk_level }}* (Score: {{ empresa.risk_score }}/100)
+💳 *Gateways Detectados:* {% for gw in empresa.metodos_pagamento %}{{ gw }}{% if not forloop.last %}, {% endif %}{% empty %}Nenhum identificado{% endfor %}
+
+🔍 *PARECER DE SEGURANÇA:*
+{% if empresa.risk_level == 'BAIXO' or empresa.risk_level == 'MÉDIO' %}
+✅ *Transação Segura para Aprovação:* A empresa investigada encontra-se com situação regularizada perante as bases oficiais e sem registros de sanções federais restritivas graves (CGU/CEIS/CNEP). O risco operacional está dentro dos parâmetros aceitáveis para liberação do pagamento.
+{% else %}
+⚠️ *ATENÇÃO / ALTO RISCO:* Foram encontrados apontamentos restritivos ou irregularidades cadastrais. Recomenda-se validação manual aprofundada antes de qualquer liberação de recursos.
+{% endif %}</textarea>
+    </div>
+</div>
+
+<script>
+function copiarTextoMensagem() {
+    const textarea = document.getElementById('textoCopiaEquipe');
+    textarea.select();
+    textarea.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(textarea.value).then(() => {
+        const btn = document.getElementById('textoBotaoCopiar');
+        btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Copiado com Sucesso!';
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fa-solid fa-clone mr-1"></i> Copiar Mensagem';
+        }, 2500);
+    });
+}
+</script>
+
 <!-- Risk Analysis Banner -->
 <div class="bg-slate-900 border {% if empresa.risk_level == 'ALTO' %}border-red-500/50 bg-red-950/20{% elif empresa.risk_level == 'MÉDIO' %}border-amber-500/50 bg-amber-950/20{% else %}border-emerald-500/50 bg-emerald-950/20{% endif %} rounded-3xl p-7 mb-8 shadow-2xl">
     <div class="flex items-center space-x-3 mb-4">
