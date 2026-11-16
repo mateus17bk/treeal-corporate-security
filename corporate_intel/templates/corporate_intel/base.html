@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}CorpGuard Intelligence • Dashboard{% endblock %}</title>
+    <title>{% block title %}Treeal • Compliance & BaaS Dashboard{% endblock %}</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -26,8 +26,8 @@
 </head>
 <body class="h-full flex overflow-hidden">
 
-    <!-- Sidebar (Estilo Helios Investments / Dark Fintech) -->
-    <aside class="w-72 bg-[#12131a] border-r border-white/5 flex flex-col justify-between hidden lg:flex p-6 shrink-0">
+    <!-- Sidebar (Estilo Helios Investments / Google Stitch) -->
+    <aside class="w-72 bg-[#12131a] border-r border-white/5 flex flex-col justify-between hidden lg:flex p-6 shrink-0 shadow-2xl">
         <div>
             <!-- Logo / Brand -->
             <div class="flex items-center space-x-3 mb-10 px-2">
@@ -35,33 +35,29 @@
                     <i class="fa-solid fa-shield-halved text-lg"></i>
                 </div>
                 <div>
-                    <span class="text-base font-extrabold tracking-tight text-white block">CorpGuard</span>
-                    <span class="text-[11px] text-purple-400 font-semibold tracking-wider uppercase">Compliance & Fraud</span>
+                    <span class="text-base font-extrabold tracking-tight text-white block">Treeal Corp</span>
+                    <span class="text-[11px] text-purple-400 font-semibold tracking-wider uppercase">ambient de teste treeal v0.1</span>
                 </div>
             </div>
 
             <!-- Navigation Links -->
             <nav class="space-y-2">
                 <a href="{% url 'dashboard' %}" class="flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl text-sm font-semibold transition {% if request.resolver_match.url_name == 'dashboard' %}sidebar-item-active text-white shadow-inner{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
-                    <i class="fa-solid fa-chart-pie text-base"></i>
-                    <span>Dashboard</span>
+                    <i class="fa-solid fa-chart-pie text-base text-purple-400"></i>
+                    <span>Dashboard Principal</span>
                 </a>
                 <a href="{% url 'historico' %}" class="flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl text-sm font-semibold transition {% if request.resolver_match.url_name == 'historico' %}sidebar-item-active text-white shadow-inner{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
-                    <i class="fa-solid fa-history text-base"></i>
-                    <span>Auditorias & Histórico</span>
+                    <i class="fa-solid fa-history text-base text-purple-400"></i>
+                    <span>Histórico de Auditorias</span>
                 </a>
             </nav>
         </div>
 
         <!-- Footer / Support inside Sidebar -->
         <div class="space-y-3 pt-6 border-t border-white/5 px-2">
-            <a href="https://github.com/rtadewald/skills" target="_blank" class="flex items-center space-x-3 px-4 py-3 rounded-2xl text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition">
-                <i class="fa-solid fa-headset text-slate-400"></i>
-                <span>Suporte & GitHub</span>
-            </a>
             <div class="flex items-center space-x-3 px-4 py-3 rounded-2xl text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>APIs Oficiais Ativas</span>
+                <span>DS Sync: Conectado</span>
             </div>
         </div>
     </aside>
@@ -72,14 +68,14 @@
         <!-- Topbar -->
         <header class="h-20 bg-[#0b0c10]/80 backdrop-blur-md border-b border-white/5 px-8 flex justify-between items-center sticky top-0 z-40">
             <div class="flex items-center space-x-4">
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest hidden sm:inline">Ambiente Corporativo Seguro</span>
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest hidden sm:inline">Plataforma Treeal • Compliance & BaaS</span>
             </div>
 
             <!-- Profile & Search Ask Bar -->
             <div class="flex items-center space-x-6">
                 <div class="hidden md:flex items-center bg-white/5 border border-white/10 px-4 py-2 rounded-2xl text-xs text-slate-400 space-x-3">
                     <i class="fa-solid fa-wand-magic-sparkles text-purple-400"></i>
-                    <span>Consulta Multi-API & CGU Ativa</span>
+                    <span>Multi-API Receita & CGU Ativa</span>
                 </div>
 
                 <!-- User Profile Badge -->
@@ -101,7 +97,7 @@
             {% for message in messages %}
             <div class="p-4 rounded-2xl shadow-xl flex items-center justify-between border backdrop-blur-sm {% if message.tags == 'error' %}bg-red-950/80 border-red-800/60 text-red-200{% elif message.tags == 'success' %}bg-emerald-950/80 border-emerald-800/60 text-emerald-200{% else %}bg-purple-950/80 border-purple-800/60 text-purple-200{% endif %}">
                 <div class="flex items-center space-x-3">
-                    <div class="p-2 rounded-xl {% if message.tags == 'error' %}bg-red-500/20 text-red-400{% else %}bg-emerald-500/20 text-emerald-400{% endif %}">
+                    <div class="p-2 rounded-xl {% if message.tags == 'error' %}bg-red-500/20 text-red-400{% else %}bg-purple-500/20 text-purple-400{% endif %}">
                         <i class="fa-solid {% if message.tags == 'error' %}fa-triangle-exclamation{% else %}fa-circle-check{% endif %} text-base"></i>
                     </div>
                     <span class="text-sm font-medium">{{ message }}</span>
@@ -119,7 +115,7 @@
 
         <!-- Footer -->
         <footer class="border-t border-white/5 py-6 px-8 text-center text-xs text-slate-500">
-            CorpGuard Intelligence &bull; Desenvolvido para Alta Segurança e Due Diligence &bull; 2026
+            ambient de teste treeal v0.1 &bull; 2026
         </footer>
     </div>
 
