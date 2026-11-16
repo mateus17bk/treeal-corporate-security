@@ -50,6 +50,14 @@
                     <i class="fa-solid fa-history text-base text-purple-400"></i>
                     <span>Histórico de Auditorias</span>
                 </a>
+                <a href="{% url 'register' %}" class="flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl text-sm font-semibold transition {% if request.resolver_match.url_name == 'register' %}sidebar-item-active text-white shadow-inner{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
+                    <i class="fa-solid fa-user-plus text-base text-emerald-400"></i>
+                    <span>Cadastrar Usuário</span>
+                </a>
+                <a href="{% url 'login' %}" class="flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl text-sm font-semibold transition {% if request.resolver_match.url_name == 'login' %}sidebar-item-active text-white shadow-inner{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
+                    <i class="fa-solid fa-right-to-bracket text-base text-indigo-400"></i>
+                    <span>Entrar / Login</span>
+                </a>
             </nav>
         </div>
 
@@ -97,7 +105,7 @@
             {% for message in messages %}
             <div class="p-4 rounded-2xl shadow-xl flex items-center justify-between border backdrop-blur-sm {% if message.tags == 'error' %}bg-red-950/80 border-red-800/60 text-red-200{% elif message.tags == 'success' %}bg-emerald-950/80 border-emerald-800/60 text-emerald-200{% else %}bg-purple-950/80 border-purple-800/60 text-purple-200{% endif %}">
                 <div class="flex items-center space-x-3">
-                    <div class="p-2 rounded-xl {% if message.tags == 'error' %}bg-red-500/20 text-red-400{% else %}bg-purple-500/20 text-purple-400{% endif %}">
+                    <div class="p-2 rounded-xl {% if message.tags == 'error' %}bg-red-500/20 text-red-400{% else %}bg-emerald-500/20 text-emerald-400{% endif %}">
                         <i class="fa-solid {% if message.tags == 'error' %}fa-triangle-exclamation{% else %}fa-circle-check{% endif %} text-base"></i>
                     </div>
                     <span class="text-sm font-medium">{{ message }}</span>
