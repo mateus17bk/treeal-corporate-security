@@ -26,7 +26,8 @@
 </head>
 <body class="h-full flex overflow-hidden">
 
-    <!-- Sidebar (Estilo Helios Investments / Google Stitch) -->
+    {% if user.is_authenticated %}
+    <!-- Sidebar (Exibida apenas quando logado) -->
     <aside class="w-72 bg-[#12131a] border-r border-white/5 flex flex-col justify-between hidden lg:flex p-6 shrink-0 shadow-2xl">
         <div>
             <!-- Logo / Brand -->
@@ -50,25 +51,25 @@
                     <i class="fa-solid fa-history text-base text-purple-400"></i>
                     <span>Histórico de Auditorias</span>
                 </a>
-                <a href="{% url 'register' %}" class="flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl text-sm font-semibold transition {% if request.resolver_match.url_name == 'register' %}sidebar-item-active text-white shadow-inner{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
-                    <i class="fa-solid fa-user-plus text-base text-emerald-400"></i>
-                    <span>Cadastrar Usuário</span>
-                </a>
-                <a href="{% url 'login' %}" class="flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl text-sm font-semibold transition {% if request.resolver_match.url_name == 'login' %}sidebar-item-active text-white shadow-inner{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
-                    <i class="fa-solid fa-right-to-bracket text-base text-indigo-400"></i>
-                    <span>Entrar / Login</span>
-                </a>
             </nav>
         </div>
 
-        <!-- Footer / Status inside Sidebar -->
+        <!-- Logout / Footer inside Sidebar -->
         <div class="space-y-3 pt-6 border-t border-white/5 px-2">
+            <form action="{% url 'logout' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-xs font-semibold text-red-400 hover:bg-red-500/10 transition border border-red-500/20">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sair da Conta</span>
+                </button>
+            </form>
             <div class="flex items-center space-x-3 px-4 py-3 rounded-2xl text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span>DS Sync: Conectado</span>
             </div>
         </div>
     </aside>
+    {% endif %}
 
     <!-- Main Wrapper -->
     <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
@@ -86,16 +87,27 @@
                     <span>Multi-API Receita & CGU Ativa</span>
                 </div>
 
-                <!-- User Profile Badge -->
+                {% if user.is_authenticated %}
+                <!-- User Profile Dynamic Badge -->
                 <div class="flex items-center space-x-3 bg-white/5 border border-white/10 pl-3 pr-4 py-2 rounded-2xl">
                     <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center font-bold text-white text-xs">
-                        MG
+                        {{ user.username|slice:":2"|upper }}
                     </div>
                     <div class="text-left">
-                        <span class="text-xs font-bold text-white block">Mateus Guedes</span>
-                        <span class="text-[10px] text-slate-400 block font-mono">mateus@treeal.com</span>
+                        <span class="text-xs font-bold text-white block">{{ user.get_full_name|default:user.username }}</span>
+                        <span class="text-[10px] text-slate-400 block font-mono">{{ user.email|default:user.username }}</span>
                     </div>
                 </div>
+                {% else %}
+                <div class="flex items-center space-x-3">
+                    <a href="{% url 'login' %}" class="bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition border border-purple-500/30">
+                        Entrar
+                    </a>
+                    <a href="{% url 'register' %}" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-md shadow-indigo-600/30">
+                        Cadastre-se
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </header>
 

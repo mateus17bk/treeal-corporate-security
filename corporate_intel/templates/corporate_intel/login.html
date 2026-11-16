@@ -32,15 +32,15 @@
             </div>
             {% endfor %}
 
-            <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white py-3.5 rounded-xl font-bold text-sm transition shadow-lg shadow-purple-600/30 mt-6 active:scale-95">
-                Entrar no Sistema
-            </button>
+            <div class="flex items-center justify-between pt-2">
+                <button type="submit" class="flex-grow bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500  text-white py-3.5 px-6 rounded-xl font-bold text-sm transition shadow-lg shadow-purple-600/30 active:scale-95">
+                    Entrar
+                </button>
+                <a href="{% url 'register' %}" class="ml-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 py-3.5 px-6 rounded-xl font-bold text-sm transition text-center">
+                    Cadastro
+                </a>
+            </div>
         </form>
-
-        <div class="mt-6 text-center text-xs text-slate-400">
-            <span>Não tem uma conta? </span>
-            <a href="{% url 'register' %}" class="text-purple-400 hover:underline font-semibold">Cadastre-se aqui</a>
-        </div>
     </div>
 </div>
 
