@@ -68,18 +68,18 @@
 Empresa: {{ empresa.razao_social|default:"N/D" }}
 CNPJ: {{ empresa.cnpj }}
 Localidade: {{ empresa.municipio|default:"N/D" }} / {{ empresa.uf|default:"--" }}
-Situacao Receita: {{ empresa.situacao|default:"N/D" }}
+Situação Receita: {{ empresa.situacao|default:"N/D" }}
 
 STATUS DE RISCO / FRAUDE: {{ empresa.risk_level }} (Score: {{ empresa.risk_score }}/100)
 Gateways Detectados: {% for gw in empresa.metodos_pagamento %}{{ gw }}{% if not forloop.last %}, {% endif %}{% empty %}Nenhum identificado{% endfor %}
 
-PARECER DE SEGURANÇA PARA APROVACAO:
+PARECER DE SEGURANÇA PARA APROVAÇÃO:
 {% if empresa.risk_level == 'BAIXO' %}
-TRANSACAO SEGURA: A empresa possui situacao regularizada e sem apontamentos restritivos relevantes. Transacao recomendada para aprovacao imediata.
+TRANSAÇÃO SEGURA: A empresa possui situação regularizada e sem apontamentos restritivos relevantes. Transação recomendada para aprovação imediata.
 {% elif empresa.risk_level == 'MÉDIO' %}
-ANALISE NECESSARIA: Foram identificadas ressalvas ou apontamentos cíveis/trabalhistas de medio impacto. Recomendada uma analise detalhada pela equipe antes de efetivar o pagamento.
+ANÁLISE NECESSÁRIA: Foram identificadas ressalvas ou apontamentos cíveis/trabalhistas de médio impacto. Recomendada uma análise detalhada pela equipe antes de efetivar o pagamento.
 {% else %}
-ALERTA CRITICO DE RISCO: A empresa apresenta restricoes graves em cadastros de sancao ou irregularidade fiscal. E necessario realizar uma varredura detalhada e due diligence aprofundada antes de qualquer liberacao de recursos.
+ALERTA CRÍTICO DE RISCO: A empresa apresenta restrições graves em cadastros de sanção ou irregularidade fiscal. É necessário realizar uma varredura detalhada e due diligence aprofundada antes de qualquer liberação de recursos.
 {% endif %}</textarea>
     </div>
 </div>
