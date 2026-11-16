@@ -1,9 +1,16 @@
-import re
 import os
+import re
 import requests
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from .models import EmpresaConsulta
+
+# Tenta importar o SDK do Google GenAI
+try:
+    from google import genai
+    GOOGLE_GENAI_AVAILABLE = True
+except ImportError:
+    GOOGLE_GENAI_AVAILABLE = False
 
 class CNPJIntelligenceService:
 
@@ -185,6 +192,48 @@ class CNPJIntelligenceService:
             "lista_processos": processos
         }
 
+    @staticmethod
+    def gerar_parecer_ia_google(dados_empresa: dict, compliance_data: dict) -> str:
+        """
+        Gera um parecer executivo automatizado utilizando o Google GenAI (Gemini).
+        Caso não haja chave de API configurada ou ocorra falha, utiliza fallback padrão.
+        """
+        gemini_key = getattr(settings, 'GEMINI_API_KEY', os.getenv('GEMINI_API_KEY', ''))
+
+        # Fallback padrão caso a API Key do Gemini não esteja configurada
+        nivel = compliance_data.get('nivel', 'BAIXO')
+        if not gemini_key or not GOOGLE_GENAI_AVAILABLE:
+            if nivel == 'BAIXO':
+                return "TRANSAÇÃO SEGURA: A empresa possui situação regularizada e sem apontamentos restritivos relevantes. Transação recomendada para aprovação imediata."
+            elif nivel == 'MÉDIO':
+                return "ANÁLISE NECESSÁRIA: Foram identificadas ressalvas ou apontamentos cíveis/trabalhistas de médio impacto. Recomendada uma análise detalhada pela equipe antes de efetivar o pagamento."
+            else:
+                return "ALERTA CRÍTICO DE RISCO: A empresa apresenta restrições graves em cadastros de sanção ou irregularidade fiscal. É necessário realizar uma varredura detalhada e due diligence aprofundada antes de qualquer liberação de recursos."
+
+        try:
+            client = genai.Client(api_key=gemini_key)
+            prompt = f"""
+            Atue como um Especialista Sênior de Compliance e Prevenção a Fraudes em meios de pagamento (BaaS - Treeal).
+            Redija um resumo executivo objetivo (exatamente 2 linhas, sem emojis, sem introduções) para a equipe de operações decidir se aprova, analisa ou bloqueia a transação com base nestes dados:
+            - Razão Social: {dados_empresa.get('razao_social')}
+            - CNPJ: {dados_empresa.get('cnpj')}
+            - Situação: {dados_empresa.get('situacao')}
+            - Risco Calculado: {nivel} (Score {compliance_data.get('score')}/100)
+            - Motivos/Sanções: {compliance_data.get('motivos')}
+            """
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt,
+            )
+            return response.text.strip()
+        except Exception:
+            if nivel == 'BAIXO':
+                return "TRANSAÇÃO SEGURA: A empresa possui situação regularizada e sem apontamentos restritivos relevantes. Transação recomendada para aprovação imediata."
+            elif nivel == 'MÉDIO':
+                return "ANÁLISE NECESSÁRIA: Foram identificadas ressalvas ou apontamentos cíveis/trabalhistas de médio impacto. Recomendada uma análise detalhada pela equipe antes de efetivar o pagamento."
+            else:
+                return "ALERTA CRÍTICO DE RISCO: A empresa apresenta restrições graves em cadastros de sanção ou irregularidade fiscal. É necessário realizar uma varredura detalhada e due diligence aprofundada antes de qualquer liberação de recursos."
+
     @classmethod
     def consultar_cnpj(cls, cnpj_raw: str) -> EmpresaConsulta:
         cnpj = cls.validar_cnpj(cnpj_raw)
@@ -228,6 +277,10 @@ class CNPJIntelligenceService:
             compliance["score"] = max(compliance["score"], 85)
             compliance["nivel"] = "ALTO"
             compliance["motivos"].insert(0, f"Atenção: Situação cadastral na Receita é '{empresa.situacao}'.")
+
+        # Gera o parecer utilizando IA do Google (com fallback inteligente)
+        parecer_ia = cls.gerar_parecer_ia_google(data, compliance)
+        compliance["parecer_ia"] = parecer_ia
 
         empresa.compliance_processos = compliance
         empresa.risk_score = compliance["score"]

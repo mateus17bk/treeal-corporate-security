@@ -44,16 +44,19 @@
     </div>
 </div>
 
-<!-- TEXTO PRONTO PARA COPIAR E ENVIAR PARA A EQUIPE (COMPLIANCE / APROVAÇÃO) -->
-<div class="glass-card rounded-3xl p-7 mb-8 shadow-2xl border border-purple-500/30 bg-purple-950/10">
+<!-- TEXTO PRONTO PARA COPIAR E ENVIAR PARA A EQUIPE (COM PARECER DA IA DO GOOGLE) -->
+<div class="glass-card rounded-3xl p-7 mb-8 shadow-2xl border border-purple-500/30 bg-purple-950/15">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
         <div class="flex items-center space-x-3">
             <div class="p-3 rounded-2xl bg-purple-500/20 text-purple-400 border border-purple-500/30 text-xl">
-                <i class="fa-solid fa-copy"></i>
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
             </div>
             <div>
-                <h3 class="text-lg font-bold text-white">Mensagem Pronta para Aprovação de Transação</h3>
-                <p class="text-xs text-slate-400">Copie o resumo executivo abaixo para enviar no canal da equipe solicitando liberação do pagamento:</p>
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span>Mensagem Pronta com Google Gemini AI</span>
+                    <span class="text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-md">Powered by Google GenAI</span>
+                </h3>
+                <p class="text-xs text-slate-400">Resumo executivo gerado por inteligência artificial para envio no canal de aprovação:</p>
             </div>
         </div>
         <button onclick="copiarTextoMensagem()" id="btnCopiar" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-lg shadow-purple-600/30 whitespace-nowrap active:scale-95">
@@ -68,19 +71,13 @@
 Empresa: {{ empresa.razao_social|default:"N/D" }}
 CNPJ: {{ empresa.cnpj }}
 Localidade: {{ empresa.municipio|default:"N/D" }} / {{ empresa.uf|default:"--" }}
-Situação Receita: {{ empresa.situacao|default:"N/D" }}
+Situacao Receita: {{ empresa.situacao|default:"N/D" }}
 
 STATUS DE RISCO / FRAUDE: {{ empresa.risk_level }} (Score: {{ empresa.risk_score }}/100)
 Gateways Detectados: {% for gw in empresa.metodos_pagamento %}{{ gw }}{% if not forloop.last %}, {% endif %}{% empty %}Nenhum identificado{% endfor %}
 
-PARECER DE SEGURANÇA PARA APROVAÇÃO:
-{% if empresa.risk_level == 'BAIXO' %}
-TRANSAÇÃO SEGURA: A empresa possui situação regularizada e sem apontamentos restritivos relevantes. Transação recomendada para aprovação imediata.
-{% elif empresa.risk_level == 'MÉDIO' %}
-ANÁLISE NECESSÁRIA: Foram identificadas ressalvas ou apontamentos cíveis/trabalhistas de médio impacto. Recomendada uma análise detalhada pela equipe antes de efetivar o pagamento.
-{% else %}
-ALERTA CRÍTICO DE RISCO: A empresa apresenta restrições graves em cadastros de sanção ou irregularidade fiscal. É necessário realizar uma varredura detalhada e due diligence aprofundada antes de qualquer liberação de recursos.
-{% endif %}</textarea>
+PARECER DO AGENTE DE IA DO GOOGLE (GEMINI):
+{{ empresa.compliance_processos.parecer_ia }}</textarea>
     </div>
 </div>
 
