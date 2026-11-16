@@ -5,7 +5,6 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 from .models import EmpresaConsulta
 
-# Tenta importar o SDK do Google GenAI
 try:
     from google import genai
     GOOGLE_GENAI_AVAILABLE = True
@@ -41,41 +40,78 @@ class CNPJIntelligenceService:
 
     @staticmethod
     def consultar_cadastros_com_fallback(cnpj: str) -> dict:
+        """
+        Sistema de Contingência Multi-API Expandido (Contém 5 opções públicas em cascata)
+        """
         apis = [
             f"https://brasilapi.com.br/api/cnpj/v1/{cnpj}",
             f"https://minhareceita.org/{cnpj}",
-            f"https://publica.cnpj.ws/cnpj/{cnpj}"
+            f"https://publica.cnpj.ws/cnpj/{cnpj}",
+            f"https://www.receitaws.com.br/v1/cnpj/{cnpj}",
+            f"https://api.cnpja.com.br/office/{cnpj}"
+        ]
+
+        headers_list = [
+            {"User-Agent": "CorpGuard-Auditor/4.0"},
+            {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
+            {"User-Agent": "TreealBaaS-Compliance/1.0", "Accept": "application/json"}
         ]
 
         for url in apis:
-            try:
-                resp = requests.get(url, timeout=7, headers={"User-Agent": "CorpGuard-Auditor/3.0"})
-                if resp.status_code == 200:
-                    data = resp.json()
-                    normalized = {
-                        "razao_social": data.get("razao_social") or data.get("razão_social"),
-                        "nome_fantasia": data.get("nome_fantasia") or data.get("estabelecimento", {}).get("nome_fantasia"),
-                        "situacao": data.get("descricao_situacao_cadastral") or data.get("estabelecimento", {}).get("situacao_cadastral"),
-                        "data_inicio_atividade": data.get("data_inicio_atividade") or data.get("estabelecimento", {}).get("data_inicio_atividade"),
-                        "capital_social": data.get("capital_social", 0.0),
-                        "natureza_juridica": data.get("natureza_juridica"),
-                        "cnae_fiscal_descricao": data.get("cnae_fiscal_descricao") or data.get("estabelecimento", {}).get("atividade_principal", {}).get("descricao"),
-                        "logradouro": data.get("logradouro") or data.get("estabelecimento", {}).get("tipo_logradouro", "") + " " + data.get("estabelecimento", {}).get("logradouro", ""),
-                        "numero": data.get("numero") or data.get("estabelecimento", {}).get("numero"),
-                        "bairro": data.get("bairro") or data.get("estabelecimento", {}).get("bairro"),
-                        "municipio": data.get("municipio") or data.get("estabelecimento", {}).get("cidade", {}).get("nome"),
-                        "uf": data.get("uf") or data.get("estabelecimento", {}).get("estado", {}).get("sigla"),
-                        "cep": data.get("cep") or data.get("estabelecimento", {}).get("cep"),
-                        "email": data.get("email") or data.get("estabelecimento", {}).get("email"),
-                        "ddd_telefone_1": data.get("ddd_telefone_1") or (data.get("estabelecimento", {}).get("ddd1", "") + data.get("estabelecimento", {}).get("telefone1", "")),
-                        "qsa": data.get("qsa") or data.get("socios", []),
-                        "site": data.get("site") or None
-                    }
-                    return normalized
-            except Exception:
-                continue
+            for headers in headers_list:
+                try:
+                    resp = requests.get(url, headers=headers, timeout=6)
+                    if resp.status_code == 200:
+                        data = resp.json()
 
-        raise ValidationError("Não foi possível consultar as bases oficiais de CNPJ no momento (Todas as APIs públicas falharam ou atingiram rate-limit).")
+                        # Tratamento para ReceitaWS (retorna formato próprio)
+                        if "status" in data and data["status"] == "OK":
+                            return {
+                                "razao_social": data.get("nome"),
+                                "nome_fantasia": data.get("fantasia"),
+                                "situacao": data.get("situacao"),
+                                "data_inicio_atividade": data.get("abertura"),
+                                "capital_social": float(data.get("capital_social", 0.0) or 0.0),
+                                "natureza_juridica": data.get("natureza_juridica"),
+                                "cnae_fiscal_descricao": data.get("atividade_principal", [{}])[0].get("text"),
+                                "logradouro": data.get("logradouro"),
+                                "numero": data.get("numero"),
+                                "bairro": data.get("bairro"),
+                                "municipio": data.get("municipio"),
+                                "uf": data.get("uf"),
+                                "cep": data.get("cep"),
+                                "email": data.get("email"),
+                                "ddd_telefone_1": data.get("telefone"),
+                                "qsa": [{"nome": q.get("nome"), "qualificacao_socio": q.get("qual")} for q in data.get("qsa", [])],
+                                "site": None
+                            }
+
+                        # Normalização padrão para as demais APIs
+                        normalized = {
+                            "razao_social": data.get("razao_social") or data.get("razão_social") or data.get("company", {}).get("name"),
+                            "nome_fantasia": data.get("nome_fantasia") or data.get("estabelecimento", {}).get("nome_fantasia") or data.get("alias"),
+                            "situacao": data.get("descricao_situacao_cadastral") or data.get("estabelecimento", {}).get("situacao_cadastral") or data.get("status"),
+                            "data_inicio_atividade": data.get("data_inicio_atividade") or data.get("estabelecimento", {}).get("data_inicio_atividade") or data.get("founded"),
+                            "capital_social": float(data.get("capital_social", 0.0) or 0.0),
+                            "natureza_juridica": data.get("natureza_juridica"),
+                            "cnae_fiscal_descricao": data.get("cnae_fiscal_descricao") or data.get("estabelecimento", {}).get("atividade_principal", {}).get("descricao") or data.get("main_activity", {}).get("text"),
+                            "logradouro": data.get("logradouro") or data.get("estabelecimento", {}).get("tipo_logradouro", "") + " " + data.get("estabelecimento", {}).get("logradouro", ""),
+                            "numero": data.get("numero") or data.get("estabelecimento", {}).get("numero"),
+                            "bairro": data.get("bairro") or data.get("estabelecimento", {}).get("bairro"),
+                            "municipio": data.get("municipio") or data.get("estabelecimento", {}).get("cidade", {}).get("nome") or data.get("address", {}).get("city"),
+                            "uf": data.get("uf") or data.get("estabelecimento", {}).get("estado", {}).get("sigla") or data.get("address", {}).get("state"),
+                            "cep": data.get("cep") or data.get("estabelecimento", {}).get("cep"),
+                            "email": data.get("email") or data.get("estabelecimento", {}).get("email"),
+                            "ddd_telefone_1": data.get("ddd_telefone_1") or (data.get("estabelecimento", {}).get("ddd1", "") + data.get("estabelecimento", {}).get("telefone1", "")),
+                            "qsa": data.get("qsa") or data.get("socios", []) or data.get("company", {}),
+                            "site": data.get("site") or None
+                        }
+                        if normalized["razao_social"]:
+                            return normalized
+                except Exception:
+                    continue
+
+        raise ValidationError("Não foi possível consultar as bases oficiais de CNPJ no momento (Todas as 5 APIs públicas de contingência falharam ou atingiram rate-limit). Aguarde 1-2 minutos.")
 
     @staticmethod
     def analisar_pagamentos_e_infra(site_url: str) -> dict:
@@ -101,7 +137,7 @@ class CNPJIntelligenceService:
         status_site = "Online e Acessível"
         try:
             headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) CorporateAuditor/3.0"}
-            resp = requests.get(site_url, headers=headers, timeout=6, allow_redirects=True)
+            resp = requests.get(site_url, headers=headers, timeout=5, allow_redirects=True)
             html = resp.text.lower()
 
             for gateway, keywords in assinaturas.items():
@@ -131,7 +167,7 @@ class CNPJIntelligenceService:
 
         try:
             url_ceis = f"https://api.portaldatransparencia.gov.br/api-de-dados/ceis?cnpjSancionado={cnpj}&pagina=1"
-            resp = requests.get(url_ceis, headers=headers, timeout=7)
+            resp = requests.get(url_ceis, headers=headers, timeout=6)
             if resp.status_code == 200:
                 sancoes_ceis = resp.json()
                 if sancoes_ceis:
@@ -151,7 +187,7 @@ class CNPJIntelligenceService:
 
         try:
             url_cnep = f"https://api.portaldatransparencia.gov.br/api-de-dados/cnep?cnpjSancionado={cnpj}&pagina=1"
-            resp = requests.get(url_cnep, headers=headers, timeout=7)
+            resp = requests.get(url_cnep, headers=headers, timeout=6)
             if resp.status_code == 200:
                 sancoes_cnep = resp.json()
                 if sancoes_cnep:
@@ -194,14 +230,9 @@ class CNPJIntelligenceService:
 
     @staticmethod
     def gerar_parecer_ia_google(dados_empresa: dict, compliance_data: dict) -> str:
-        """
-        Gera um parecer executivo automatizado utilizando o Google GenAI (Gemini).
-        Caso não haja chave de API configurada ou ocorra falha, utiliza fallback padrão.
-        """
         gemini_key = getattr(settings, 'GEMINI_API_KEY', os.getenv('GEMINI_API_KEY', ''))
-
-        # Fallback padrão caso a API Key do Gemini não esteja configurada
         nivel = compliance_data.get('nivel', 'BAIXO')
+
         if not gemini_key or not GOOGLE_GENAI_AVAILABLE:
             if nivel == 'BAIXO':
                 return "TRANSAÇÃO SEGURA: A empresa possui situação regularizada e sem apontamentos restritivos relevantes. Transação recomendada para aprovação imediata."
@@ -278,7 +309,6 @@ class CNPJIntelligenceService:
             compliance["nivel"] = "ALTO"
             compliance["motivos"].insert(0, f"Atenção: Situação cadastral na Receita é '{empresa.situacao}'.")
 
-        # Gera o parecer utilizando IA do Google (com fallback inteligente)
         parecer_ia = cls.gerar_parecer_ia_google(data, compliance)
         compliance["parecer_ia"] = parecer_ia
 
