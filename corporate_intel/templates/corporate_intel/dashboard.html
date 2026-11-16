@@ -3,156 +3,128 @@
 {% block title %}Dashboard • CorpGuard Intelligence{% endblock %}
 
 {% block content %}
-<!-- Hero / Onboarding Banner -->
-<div class="bg-gradient-to-r from-slate-800 via-indigo-950 to-slate-900 border border-slate-700/80 rounded-3xl p-8 md:p-12 mb-10 shadow-2xl relative overflow-hidden">
-    <div class="absolute right-0 top-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="max-w-3xl relative z-10">
-        <div class="inline-flex items-center space-x-2 bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 px-4 py-1.5 rounded-full text-xs font-bold mb-4 uppercase tracking-wider">
-            <i class="fa-solid fa-shield-halved"></i>
-            <span>Inteligência Comercial & Prevenção a Fraudes</span>
-        </div>
-        <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight mb-4">Descubra com quem você está negociando em segundos.</h1>
-        <p class="text-slate-300 text-base md:text-lg mb-8 leading-relaxed">
-            Digite o <strong>CNPJ</strong> de qualquer empresa para verificar dados cadastrais oficiais, sanções governamentais (CEIS/CNEP), histórico de processos e meios de pagamento utilizados.
-        </p>
+<!-- Header Search & Action -->
+<div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 mb-8 shadow-xl">
+    <div class="max-w-3xl">
+        <h1 class="text-3xl font-bold text-white mb-2">Consulta Inteligente de CNPJ & Due Diligence</h1>
+        <p class="text-slate-400 mb-6">Informe o CNPJ da empresa para realizar varredura cadastral, detecção de métodos de pagamento, análise de fraudes e processos judiciais.</p>
 
-        <!-- Search Form with UX Guider -->
-        <form action="{% url 'consultar_cnpj' %}" method="POST" class="bg-slate-900/90 border border-slate-700 p-2 rounded-2xl shadow-xl flex flex-col md:flex-row gap-2">
+        <form action="{% url 'consultar_cnpj' %}" method="POST" class="flex flex-col sm:flex-row gap-3">
             {% csrf_token %}
             <div class="relative flex-grow">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-indigo-400">
-                    <i class="fa-solid fa-magnifying-glass"></i>
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                    <i class="fa-solid fa-building-columns"></i>
                 </span>
-                <input type="text" name="cnpj" placeholder="Digite o CNPJ (ex: 60.701.190/0001-04 ou apenas números)" required
-                    class="w-full pl-12 pr-4 py-3.5 bg-transparent border-0 text-white placeholder-slate-500 focus:outline-none focus:ring-0 font-mono text-base">
+                <input type="text" name="cnpj" placeholder="Digite o CNPJ (ex: 00.000.000/0001-00 ou só números)" required
+                    class="w-full pl-11 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono text-lg">
             </div>
-            <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3.5 rounded-xl font-bold transition flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/30">
-                <span>Investigar CNPJ</span>
-                <i class="fa-solid fa-arrow-right"></i>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-semibold transition flex items-center justify-center space-x-2 shadow-lg shadow-blue-600/30">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Investigar Empresa</span>
             </button>
         </form>
-        <div class="flex items-center space-x-4 mt-3 text-xs text-slate-400 pl-2">
-            <span><i class="fa-solid fa-check text-emerald-400 mr-1"></i> Dados oficiais da Receita</span>
-            <span><i class="fa-solid fa-check text-emerald-400 mr-1"></i> Portal da Transparência (CGU)</span>
-            <span><i class="fa-solid fa-check text-emerald-400 mr-1"></i> Análise Anti-Fraude</span>
-        </div>
     </div>
 </div>
 
 <!-- Stats Overview -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-    <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-6 shadow-xl flex items-center justify-between">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-md flex items-center justify-between">
         <div>
-            <p class="text-xs uppercase tracking-wider text-slate-400 font-bold">Total Investigado</p>
+            <p class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Total Consultas</p>
             <h3 class="text-3xl font-extrabold text-white mt-1">{{ total_consultas }}</h3>
-            <p class="text-xs text-slate-500 mt-1">Empresas na base</p>
         </div>
-        <div class="bg-indigo-500/15 text-indigo-400 p-4 rounded-2xl border border-indigo-500/30 text-xl">
+        <div class="bg-blue-500/10 text-blue-400 p-4 rounded-xl border border-blue-500/20 text-xl">
             <i class="fa-solid fa-database"></i>
         </div>
     </div>
-    <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-6 shadow-xl flex items-center justify-between">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-md flex items-center justify-between">
         <div>
-            <p class="text-xs uppercase tracking-wider text-red-400 font-bold">Risco Alto / Sanções</p>
+            <p class="text-xs uppercase tracking-wider text-red-400 font-semibold">Risco Alto / Fraude</p>
             <h3 class="text-3xl font-extrabold text-red-400 mt-1">{{ risco_alto }}</h3>
-            <p class="text-xs text-slate-500 mt-1">Requer atenção</p>
         </div>
-        <div class="bg-red-500/15 text-red-400 p-4 rounded-2xl border border-red-500/30 text-xl">
+        <div class="bg-red-500/10 text-red-400 p-4 rounded-xl border border-red-500/20 text-xl">
             <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
     </div>
-    <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-6 shadow-xl flex items-center justify-between">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-md flex items-center justify-between">
         <div>
-            <p class="text-xs uppercase tracking-wider text-amber-400 font-bold">Risco Médio</p>
+            <p class="text-xs uppercase tracking-wider text-amber-400 font-semibold">Risco Médio / Processos</p>
             <h3 class="text-3xl font-extrabold text-amber-400 mt-1">{{ risco_medio }}</h3>
-            <p class="text-xs text-slate-500 mt-1">Com ressalvas</p>
         </div>
-        <div class="bg-amber-500/15 text-amber-400 p-4 rounded-2xl border border-amber-500/30 text-xl">
+        <div class="bg-amber-500/10 text-amber-400 p-4 rounded-xl border border-amber-500/20 text-xl">
             <i class="fa-solid fa-scale-balanced"></i>
         </div>
     </div>
-    <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-6 shadow-xl flex items-center justify-between">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-md flex items-center justify-between">
         <div>
-            <p class="text-xs uppercase tracking-wider text-emerald-400 font-bold">Risco Baixo / Seguro</p>
+            <p class="text-xs uppercase tracking-wider text-emerald-400 font-semibold">Risco Baixo / Confiável</p>
             <h3 class="text-3xl font-extrabold text-emerald-400 mt-1">{{ risco_baixo }}</h3>
-            <p class="text-xs text-slate-500 mt-1">Operação regular</p>
         </div>
-        <div class="bg-emerald-500/15 text-emerald-400 p-4 rounded-2xl border border-emerald-500/30 text-xl">
+        <div class="bg-emerald-500/10 text-emerald-400 p-4 rounded-xl border border-emerald-500/20 text-xl">
             <i class="fa-solid fa-circle-check"></i>
         </div>
     </div>
 </div>
 
 <!-- Recent Queries Table -->
-<div class="bg-slate-800 border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden mb-12">
-    <div class="px-8 py-6 border-b border-slate-700/80 flex justify-between items-center bg-slate-850">
-        <div class="flex items-center space-x-3">
-            <div class="w-3 h-3 rounded-full bg-indigo-500 animate-pulse"></div>
-            <h3 class="font-bold text-lg text-white">Últimas Consultas Realizadas</h3>
-        </div>
-        <a href="{% url 'historico' %}" class="text-sm text-indigo-400 hover:text-indigo-300 font-bold transition flex items-center space-x-1.5">
-            <span>Ver histórico completo</span>
-            <i class="fa-solid fa-arrow-right text-xs"></i>
-        </a>
+<div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-xl overflow-hidden">
+    <div class="px-6 py-5 border-b border-slate-700 flex justify-between items-center">
+        <h3 class="font-bold text-lg text-white"><i class="fa-solid fa-clock-rotate-left mr-2 text-blue-400"></i> Consultas Recentes</h3>
+        <a href="{% url 'historico' %}" class="text-sm text-blue-400 hover:underline font-medium">Ver todas &rarr;</a>
     </div>
 
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="bg-slate-900/80 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-700/80">
-                    <th class="py-4 px-8">CNPJ / Razão Social</th>
+                <tr class="bg-slate-900/60 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-700">
+                    <th class="py-4 px-6">CNPJ / Razão Social</th>
                     <th class="py-4 px-6">Localidade</th>
                     <th class="py-4 px-6">Situação</th>
                     <th class="py-4 px-6">Nível de Risco</th>
-                    <th class="py-4 px-6">Métodos de Pagamento</th>
-                    <th class="py-4 px-8 text-right">Ações</th>
+                    <th class="py-4 px-6">Gateways / Pix</th>
+                    <th class="py-4 px-6 text-right">Ações</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-700/60 text-sm">
+            <tbody class="divide-y divide-slate-700 text-sm">
                 {% for emp in empresas %}
-                <tr class="hover:bg-slate-750/70 transition group">
-                    <td class="py-4 px-8">
-                        <span class="font-mono font-bold text-white block text-sm">{{ emp.cnpj }}</span>
-                        <span class="text-xs text-slate-400 block mt-0.5">{{ emp.razao_social|truncatechars:45 }}</span>
+                <tr class="hover:bg-slate-750 transition">
+                    <td class="py-4 px-6">
+                        <span class="font-mono font-semibold text-white block">{{ emp.cnpj }}</span>
+                        <span class="text-xs text-slate-400">{{ emp.razao_social|truncatechars:45 }}</span>
                     </td>
-                    <td class="py-4 px-6 text-slate-300 font-medium">
-                        {{ emp.municipio|default:"N/D" }} <span class="text-slate-500">/</span> {{ emp.uf|default:"--" }}
+                    <td class="py-4 px-6 text-slate-300">
+                        {{ emp.municipio|default:"N/D" }} / {{ emp.uf|default:"--" }}
                     </td>
                     <td class="py-4 px-6">
-                        <span class="px-3 py-1 text-xs rounded-full font-semibold inline-flex items-center space-x-1.5 {% if emp.situacao == 'ATIVA' %}bg-emerald-500/15 text-emerald-300 border border-emerald-500/30{% else %}bg-red-500/15 text-red-300 border border-red-500/30{% endif %}">
-                            <span class="w-1.5 h-1.5 rounded-full {% if emp.situacao == 'ATIVA' %}bg-emerald-400{% else %}bg-red-400{% endif %}"></span>
-                            <span>{{ emp.situacao|default:"DESCONHECIDA" }}</span>
+                        <span class="px-2.5 py-1 text-xs rounded-full font-medium {% if emp.situacao == 'ATIVA' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% else %}bg-red-500/10 text-red-400 border border-red-500/20{% endif %}">
+                            {{ emp.situacao|default:"DESCONHECIDA" }}
                         </span>
                     </td>
                     <td class="py-4 px-6">
-                        <span class="px-3.5 py-1 text-xs rounded-full font-extrabold tracking-wide {% if emp.risk_level == 'ALTO' %}bg-red-600 text-white shadow-md shadow-red-600/30{% elif emp.risk_level == 'MÉDIO' %}bg-amber-500 text-slate-950{% else %}bg-emerald-600 text-white{% endif %}">
-                            {{ emp.risk_level }} <span class="font-normal opacity-90">({{ emp.risk_score }}pts)</span>
+                        <span class="px-3 py-1 text-xs rounded-full font-bold {% if emp.risk_level == 'ALTO' %}bg-red-600 text-white shadow-md shadow-red-600/30{% elif emp.risk_level == 'MÉDIO' %}bg-amber-500 text-slate-950 font-extrabold{% else %}bg-emerald-600 text-white{% endif %}">
+                            {{ emp.risk_level }} ({{ emp.risk_score }}pts)
                         </span>
                     </td>
                     <td class="py-4 px-6">
-                        <div class="flex flex-wrap gap-1.5">
+                        <div class="flex flex-wrap gap-1">
                             {% for gw in emp.metodos_pagamento %}
-                            <span class="bg-slate-900 border border-slate-700/80 text-xs px-2.5 py-1 rounded-lg text-indigo-300 font-medium">{{ gw }}</span>
+                            <span class="bg-slate-900 border border-slate-700 text-xs px-2 py-0.5 rounded text-blue-300">{{ gw }}</span>
                             {% empty %}
-                            <span class="text-xs text-slate-500 italic">Nenhum detectado</span>
+                            <span class="text-xs text-slate-500">Nenhum detectado</span>
                             {% endfor %}
                         </div>
                     </td>
-                    <td class="py-4 px-8 text-right">
-                        <a href="{% url 'detalhes_empresa' emp.pk %}" class="bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition border border-indigo-500/30 inline-flex items-center space-x-1.5 shadow-sm">
-                            <i class="fa-solid fa-file-lines"></i>
-                            <span>Ver Relatório</span>
+                    <td class="py-4 px-6 text-right">
+                        <a href="{% url 'detalhes_empresa' emp.pk %}" class="bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition border border-blue-500/30">
+                            <i class="fa-solid fa-eye mr-1"></i> Relatório
                         </a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="py-16 text-center text-slate-500">
-                        <div class="w-16 h-16 bg-slate-900 border border-slate-700/80 rounded-2xl flex items-center justify-center mx-auto mb-3 text-slate-400 text-2xl">
-                            <i class="fa-solid fa-folder-open"></i>
-                        </div>
-                        <p class="text-slate-400 font-medium">Nenhuma empresa consultada recentemente.</p>
-                        <p class="text-xs text-slate-500 mt-1">Digite um CNPJ no topo da página para iniciar sua primeira investigação.</p>
+                    <td colspan="6" class="py-12 text-center text-slate-500">
+                        <i class="fa-solid fa-folder-open text-4xl mb-3 block opacity-40"></i>
+                        Nenhuma empresa consultada até o momento. Digite um CNPJ acima para iniciar a investigação.
                     </td>
                 </tr>
                 {% endfor %}

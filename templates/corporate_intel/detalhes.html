@@ -1,29 +1,29 @@
 {% extends 'corporate_intel/base.html' %}
 
-{% block title %}Diligência: {{ empresa.razao_social|default:empresa.cnpj }} • CorpGuard{% endblock %}
+{% block title %}Dossiê Corporativo: {{ empresa.razao_social|default:empresa.cnpj }} • CorpGuard{% endblock %}
 
-{% block content %}
+{% block content -->
 <div class="mb-6 flex items-center justify-between">
-    <a href="{% url 'dashboard' %}" class="text-sm text-slate-400 hover:text-white transition flex items-center space-x-2 bg-slate-800 px-4 py-2 rounded-xl border border-slate-700">
+    <a href="{% url 'dashboard' %}" class="text-sm text-slate-300 hover:text-white transition flex items-center space-x-2 bg-slate-900 px-4 py-2.5 rounded-xl border border-slate-800 shadow-sm">
         <i class="fa-solid fa-arrow-left"></i>
         <span>Voltar ao Dashboard</span>
     </a>
     <div class="flex space-x-3">
-        <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-4 py-2.5 rounded-xl text-sm font-semibold transition flex items-center space-x-2 shadow-sm">
+        <button onclick="window.print()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 px-4.5 py-2.5 rounded-xl text-sm font-semibold transition flex items-center space-x-2 shadow-sm">
             <i class="fa-solid fa-print"></i>
-            <span>Imprimir / PDF</span>
+            <span>Exportar Dossiê (PDF)</span>
         </button>
     </div>
 </div>
 
-<!-- Header Card -->
-<div class="bg-gradient-to-br from-slate-800 via-slate-900 to-indigo-950 border border-slate-700/80 rounded-3xl p-8 md:p-10 mb-8 shadow-2xl relative overflow-hidden">
+<!-- SaaS Header Dossiê Card -->
+<div class="bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 border border-slate-800 rounded-3xl p-8 md:p-10 mb-8 shadow-2xl relative overflow-hidden">
     <div class="absolute -right-16 -top-16 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
         <div>
             <div class="flex flex-wrap items-center gap-3 mb-3">
-                <span class="font-mono text-base font-bold bg-slate-950 px-3.5 py-1.5 rounded-xl text-indigo-400 border border-slate-700 shadow-inner">{{ empresa.cnpj }}</span>
-                <span class="px-3.5 py-1.5 text-xs rounded-full font-semibold inline-flex items-center space-x-1.5 {% if empresa.situacao == 'ATIVA' %}bg-emerald-500/15 text-emerald-300 border border-emerald-500/30{% else %}bg-red-500/15 text-red-300 border border-red-500/30{% endif %}">
+                <span class="font-mono text-base font-bold bg-slate-950 px-4 py-1.5 rounded-xl text-indigo-400 border border-slate-800 shadow-inner">{{ empresa.cnpj }}</span>
+                <span class="px-3.5 py-1.5 text-xs rounded-full font-semibold inline-flex items-center space-x-1.5 {% if empresa.situacao == 'ATIVA' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% else %}bg-red-500/10 text-red-400 border border-red-500/20{% endif %}">
                     <span class="w-2 h-2 rounded-full {% if empresa.situacao == 'ATIVA' %}bg-emerald-400 animate-pulse{% else %}bg-red-400{% endif %}"></span>
                     <span>{{ empresa.situacao|default:"DESCONHECIDA" }}</span>
                 </span>
@@ -34,8 +34,8 @@
             {% endif %}
         </div>
 
-        <div class="bg-slate-950/80 border border-slate-700/80 rounded-2xl p-5 text-center min-w-[220px] shadow-xl">
-            <span class="text-xs uppercase tracking-wider text-slate-400 block mb-1 font-bold">Índice de Risco / Fraude</span>
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 text-center min-w-[220px] shadow-xl">
+            <span class="text-xs uppercase tracking-wider text-slate-400 block mb-1 font-bold">Classificação de Risco</span>
             <span class="text-2xl font-extrabold tracking-wide {% if empresa.risk_level == 'ALTO' %}text-red-400 animate-pulse{% elif empresa.risk_level == 'MÉDIO' %}text-amber-400{% else %}text-emerald-400{% endif %}">
                 {{ empresa.risk_level }}
             </span>
@@ -44,21 +44,21 @@
     </div>
 </div>
 
-<!-- PAINEL EXPLICATIVO DOS MOTIVOS DE RISCO / FRAUDE (DESTAQUE) -->
-<div class="bg-slate-800/90 backdrop-blur border {% if empresa.risk_level == 'ALTO' %}border-red-500/50 bg-red-950/20{% elif empresa.risk_level == 'MÉDIO' %}border-amber-500/50 bg-amber-950/20{% else %}border-emerald-500/50 bg-emerald-950/20{% endif %} rounded-3xl p-7 mb-8 shadow-2xl">
+<!-- Risk Analysis Banner -->
+<div class="bg-slate-900 border {% if empresa.risk_level == 'ALTO' %}border-red-500/50 bg-red-950/20{% elif empresa.risk_level == 'MÉDIO' %}border-amber-500/50 bg-amber-950/20{% else %}border-emerald-500/50 bg-emerald-950/20{% endif %} rounded-3xl p-7 mb-8 shadow-2xl">
     <div class="flex items-center space-x-3 mb-4">
         <div class="p-3 rounded-2xl {% if empresa.risk_level == 'ALTO' %}bg-red-500/20 text-red-400 border border-red-500/30{% elif empresa.risk_level == 'MÉDIO' %}bg-amber-500/20 text-amber-400 border border-amber-500/30{% else %}bg-emerald-500/20 text-emerald-400 border border-emerald-500/30{% endif %} text-xl">
             <i class="fa-solid {% if empresa.risk_level == 'ALTO' %}fa-triangle-exclamation{% elif empresa.risk_level == 'MÉDIO' %}fa-scale-balanced{% else %}fa-circle-check{% endif %}"></i>
         </div>
         <div>
-            <h3 class="text-lg font-bold text-white">Análise de Justificativa de Risco (Por que esta classificação?)</h3>
-            <p class="text-xs text-slate-300">Fatores determinantes avaliados pelo motor de compliance e antitravamento de fraudes:</p>
+            <h3 class="text-lg font-bold text-white">Parecer de Risco & Compliance</h3>
+            <p class="text-xs text-slate-300">Justificativa automatizada com base em checagens cruzadas da Receita e CGU:</p>
         </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        <div class="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-5 shadow-inner">
-            <span class="text-xs uppercase tracking-wider text-slate-400 font-bold block mb-2"><i class="fa-solid fa-list-check mr-1.5 text-indigo-400"></i> Motivos Principais Identificados:</span>
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-inner">
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-bold block mb-2"><i class="fa-solid fa-list-check mr-1.5 text-indigo-400"></i> Fatores Identificados:</span>
             <ul class="space-y-2 text-sm text-slate-200">
                 {% if empresa.compliance_processos.motivos %}
                     {% for motivo in empresa.compliance_processos.motivos %}
@@ -73,22 +73,22 @@
             </ul>
         </div>
 
-        <div class="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-5 shadow-inner flex flex-col justify-between">
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-inner flex flex-col justify-between">
             <div>
-                <span class="text-xs uppercase tracking-wider text-slate-400 font-bold block mb-2"><i class="fa-solid fa-shield-halved mr-1.5 text-indigo-400"></i> Resumo da Auditoria:</span>
+                <span class="text-xs uppercase tracking-wider text-slate-400 font-bold block mb-2"><i class="fa-solid fa-shield-halved mr-1.5 text-indigo-400"></i> Recomendação Operacional:</span>
                 <p class="text-sm text-slate-300 leading-relaxed">
                     {% if empresa.risk_level == 'ALTO' %}
-                    <strong class="text-red-400">Atenção Crítica:</strong> A empresa apresenta restrições graves em cadastros federais de sanção (CGU/CEIS/CNEP) ou situação cadastral irregular na Receita Federal. Recomenda-se bloqueio imediato de transações de alto valor ou parcerias.
+                    <strong class="text-red-400">Atenção Crítica:</strong> Constam restrições graves em cadastros federais de sanção ou irregularidade cadastral. Recomendado bloqueio de transações e parcerias comerciais.
                     {% elif empresa.risk_level == 'MÉDIO' %}
-                    <strong class="text-amber-400">Cautela Recomendada:</strong> Existem processos judiciais ou apontamentos trabalhistas/cíveis em andamento. É aconselhável due diligence aprofundada antes de firmar contratos comerciais.
+                    <strong class="text-amber-400">Cautela Recomendada:</strong> Existem apontamentos judiciais ou cíveis pendentes. É aconselhável due diligence detalhada antes de assinar contratos.
                     {% else %}
-                    <strong class="text-emerald-400">Operação Regular:</strong> CNPJ ativo, sem registros de sanções federais ou restrições graves nas bases públicas consultadas.
+                    <strong class="text-emerald-400">Parceiro Confiável:</strong> CNPJ ativo, regularizado na Receita Federal e sem registros de sanções federais na CGU.
                     {% endif %}
                 </p>
             </div>
-            <div class="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-400 flex justify-between">
-                <span>Score Numérico: <strong class="text-white">{{ empresa.risk_score }}/100</strong></span>
-                <span>Total de Ocorrências: <strong class="text-white">{{ empresa.compliance_processos.total_processos|default:0 }}</strong></span>
+            <div class="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-400 flex justify-between font-mono">
+                <span>Score: <strong class="text-white">{{ empresa.risk_score }}/100</strong></span>
+                <span>Ocorrências: <strong class="text-white">{{ empresa.compliance_processos.total_processos|default:0 }}</strong></span>
             </div>
         </div>
     </div>
@@ -100,40 +100,40 @@
     <!-- Coluna 1 & 2: Processos Judiciais & QSA -->
     <div class="lg:col-span-2 space-y-8">
 
-        <!-- Compliance & Processos / Sanções CGU -->
-        <div class="bg-slate-800/90 backdrop-blur border border-slate-700/80 rounded-3xl p-7 shadow-xl">
+        <!-- Compliance & Sanções CGU -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-7 shadow-xl">
             <h3 class="text-lg font-bold text-white mb-4 flex items-center">
-                <i class="fa-solid fa-scale-balanced mr-2.5 text-amber-400"></i> Sanções, Processos & Ocorrências Legais
+                <i class="fa-solid fa-scale-balanced mr-2.5 text-amber-400"></i> Sanções (CGU) & Processos Oficiais
             </h3>
 
             {% if empresa.compliance_processos.lista_processos %}
             <div class="space-y-4">
                 {% for proc in empresa.compliance_processos.lista_processos %}
-                <div class="bg-slate-900/90 border border-slate-700/80 p-5 rounded-2xl shadow-md">
+                <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl shadow-md">
                     <div class="flex justify-between items-start mb-2">
                         <span class="font-bold text-white text-sm">{{ proc.tipo }}</span>
-                        <span class="text-xs px-3 py-1 rounded-full bg-red-500/15 text-red-300 border border-red-500/30 font-semibold">{{ proc.status }}</span>
+                        <span class="text-xs px-3 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 font-semibold">{{ proc.status }}</span>
                     </div>
                     <p class="text-xs text-slate-400 mb-2">Órgão / Tribunal: <span class="text-slate-200 font-medium">{{ proc.tribunal }}</span></p>
-                    <p class="text-sm text-slate-300 bg-slate-950/80 p-3 rounded-xl border border-slate-800 font-mono leading-relaxed">{{ proc.detalhe }}</p>
+                    <p class="text-sm text-slate-300 bg-slate-900 p-3 rounded-xl border border-slate-800 font-mono leading-relaxed">{{ proc.detalhe }}</p>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
-            <div class="bg-emerald-950/40 border border-emerald-700/50 rounded-2xl p-5 text-emerald-300 text-sm flex items-center space-x-4 shadow-inner">
+            <div class="bg-emerald-950/30 border border-emerald-800/50 rounded-2xl p-5 text-emerald-300 text-sm flex items-center space-x-4 shadow-inner">
                 <div class="bg-emerald-500/20 p-3.5 rounded-xl border border-emerald-500/30 text-emerald-400 text-xl">
                     <i class="fa-solid fa-circle-check"></i>
                 </div>
                 <div>
                     <p class="font-bold text-base">Nenhum processo ou sanção federal ativa</p>
-                    <p class="text-xs opacity-90 mt-0.5">Nenhuma ocorrência encontrada nas bases consultadas.</p>
+                    <p class="text-xs opacity-90 mt-0.5">Empresa sem apontamentos restritivos nas bases consultadas.</p>
                 </div>
             </div>
             {% endif %}
         </div>
 
         <!-- Quadro Societário (QSA) -->
-        <div class="bg-slate-800/90 backdrop-blur border border-slate-700/80 rounded-3xl p-7 shadow-xl">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-7 shadow-xl">
             <h3 class="text-lg font-bold text-white mb-4 flex items-center">
                 <i class="fa-solid fa-users mr-2.5 text-indigo-400"></i> Quadro Societário (QSA)
             </h3>
@@ -142,18 +142,18 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
                     <thead>
-                        <tr class="border-b border-slate-700/80 text-slate-400 text-xs uppercase tracking-wider">
+                        <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase tracking-wider">
                             <th class="py-3 px-4">Nome do Sócio</th>
                             <th class="py-3 px-4">Qualificação</th>
                             <th class="py-3 px-4">Faixa Etária / País</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-700/60">
+                    <tbody class="divide-y divide-slate-800">
                         {% for socio in empresa.socios %}
-                        <tr class="hover:bg-slate-750/50 transition">
+                        <tr class="hover:bg-slate-850 transition">
                             <td class="py-3.5 px-4 font-semibold text-white">{{ socio.nome }}</td>
                             <td class="py-3.5 px-4 text-slate-300">{{ socio.qualificacao_socio }}</td>
-                            <td class="py-3.5 px-4 text-slate-400">{{ socio.faixa_etaria|default:"N/D" }}</td>
+                            <td class="py-3.5 px-4 text-slate-400 font-mono">{{ socio.faixa_etaria|default:"N/D" }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -170,31 +170,31 @@
     <div class="space-y-8">
 
         <!-- Métodos de Pagamento Detectados -->
-        <div class="bg-slate-800/90 backdrop-blur border border-slate-700/80 rounded-3xl p-7 shadow-xl">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-7 shadow-xl">
             <h3 class="text-lg font-bold text-white mb-3 flex items-center">
                 <i class="fa-solid fa-credit-card mr-2.5 text-emerald-400"></i> Meios de Pagamento & Checkout
             </h3>
-            <p class="text-xs text-slate-400 mb-5 leading-relaxed">Gateways, Pix e tecnologias de recebimento identificadas na infraestrutura web:</p>
+            <p class="text-xs text-slate-400 mb-5 leading-relaxed">Gateways, Pix e tecnologias de recebimento identificadas:</p>
 
             <div class="flex flex-wrap gap-2">
                 {% for gw in empresa.metodos_pagamento %}
-                <span class="bg-slate-900 border border-slate-700/80 text-sm px-3.5 py-2 rounded-xl font-semibold text-indigo-300 flex items-center space-x-2 shadow-sm">
+                <span class="bg-slate-950 border border-slate-800 text-sm px-3.5 py-2 rounded-xl font-semibold text-indigo-300 flex items-center space-x-2 shadow-sm">
                     <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
                     <span>{{ gw }}</span>
                 </span>
                 {% empty %}
-                <span class="text-sm text-slate-500 italic bg-slate-900/50 p-4 rounded-xl border border-slate-800 block text-center">Nenhum gateway evidente detectado na varredura pública.</span>
+                <span class="text-sm text-slate-500 italic bg-slate-950 p-4 rounded-xl border border-slate-800 block text-center">Nenhum gateway evidente detectado.</span>
                 {% endfor %}
             </div>
         </div>
 
         <!-- Informações Cadastrais -->
-        <div class="bg-slate-800/90 backdrop-blur border border-slate-700/80 rounded-3xl p-7 shadow-xl space-y-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-7 shadow-xl space-y-4">
             <h3 class="text-lg font-bold text-white mb-2 flex items-center">
                 <i class="fa-solid fa-building mr-2.5 text-indigo-400"></i> Dados Cadastrais
             </h3>
 
-            <div class="text-sm space-y-3.5 border-t border-slate-700/80 pt-4">
+            <div class="text-sm space-y-3.5 border-t border-slate-800 pt-4">
                 <div>
                     <span class="text-xs uppercase tracking-wider text-slate-400 block font-bold mb-1">Atividade Principal (CNAE)</span>
                     <span class="text-slate-200 leading-relaxed block">{{ empresa.atividade_principal|default:"Não informada" }}</span>
