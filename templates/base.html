@@ -22,6 +22,49 @@
             background: linear-gradient(90deg, rgba(139, 92, 246, 0.25) 0%, rgba(217, 70, 239, 0.1) 100%);
             border-left: 3px solid #a855f7;
         }
+
+        /* Estilos especiais para Impressão e PDF */
+        @media print {
+            body {
+                background-color: #ffffff !important;
+                color: #0f172a !important;
+                overflow: visible !important;
+            }
+            aside, header, footer, button, a, .no-print {
+                display: none !important;
+            }
+            .flex-1 {
+                overflow: visible !important;
+                display: block !important;
+            }
+            main {
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+            }
+            .glass-card, div {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                border: 1px solid #cbd5e1 !important;
+                box-shadow: none !important;
+                backdrop-filter: none !important;
+            }
+            h1, h2, h3, p, span, strong, th, td {
+                color: #0f172a !important;
+            }
+            textarea {
+                background: #f8fafc !important;
+                color: #0f172a !important;
+                border: 1px solid #cbd5e1 !important;
+            }
+            table {
+                page-break-inside: auto;
+            }
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+        }
     </style>
 </head>
 <body class="h-full flex overflow-hidden">
