@@ -11,10 +11,12 @@ try:
 except ImportError:
     GOOGLE_GENAI_AVAILABLE = False
 
-class CNPJIntelligenceService:
+
+class CNPJValidator:
+    """Responsável por validações matemáticas e estruturais de CNPJ."""
 
     @staticmethod
-    def validar_cnpj(cnpj: str) -> str:
+    def validar(cnpj: str) -> str:
         cnpj_limpo = re.sub(r'\D', '', cnpj)
         if len(cnpj_limpo) != 14:
             raise ValidationError("O CNPJ deve conter exatamente 14 dígitos.")
@@ -38,8 +40,12 @@ class CNPJIntelligenceService:
 
         return cnpj_limpo
 
+
+class MultiAPIFallbackService:
+    """Gerencia consultas cadastrais utilizando 5 provedores públicos em cascata."""
+
     @staticmethod
-    def consultar_cadastros_com_fallback(cnpj: str) -> dict:
+    def consultar(cnpj: str) -> dict:
         apis = [
             f"https://brasilapi.com.br/api/cnpj/v1/{cnpj}",
             f"https://minhareceita.org/{cnpj}",
@@ -93,7 +99,7 @@ class CNPJIntelligenceService:
                             "logradouro": data.get("logradouro") or data.get("estabelecimento", {}).get("tipo_logradouro", "") + " " + data.get("estabelecimento", {}).get("logradouro", ""),
                             "numero": data.get("numero") or data.get("estabelecimento", {}).get("numero"),
                             "bairro": data.get("bairro") or data.get("estabelecimento", {}).get("bairro"),
-                            "municipio": data.get("municipio") or data.get("estabelecimento", {}).get("estabelecimento", {}).get("cidade", {}).get("nome") or data.get("address", {}).get("city"),
+                            "municipio": data.get("municipio") or data.get("estabelecimento", {}).get("cidade", {}).get("nome") or data.get("address", {}).get("city"),
                             "uf": data.get("uf") or data.get("estabelecimento", {}).get("estado", {}).get("sigla") or data.get("address", {}).get("state"),
                             "cep": data.get("cep") or data.get("estabelecimento", {}).get("cep"),
                             "email": data.get("email") or data.get("estabelecimento", {}).get("email"),
@@ -108,8 +114,12 @@ class CNPJIntelligenceService:
 
         raise ValidationError("Não foi possível consultar as bases oficiais de CNPJ no momento (Todas as 5 APIs públicas de contingência falharam ou atingiram rate-limit). Aguarde 1-2 minutos.")
 
+
+class OSINTPaymentScanner:
+    """Varredura web para identificar gateways de pagamento e métodos (Pix)."""
+
     @staticmethod
-    def analisar_pagamentos_e_infra(site_url: str) -> dict:
+    def escanear(site_url: str) -> dict:
         if not site_url or site_url in ['N/D', '']:
             return {"gateways": [], "status_site": "Sem site corporativo vinculado"}
 
@@ -148,8 +158,12 @@ class CNPJIntelligenceService:
             "status_site": status_site
         }
 
+
+class CGUComplianceService:
+    """Consulta sanções federais (CEIS e CNEP) via Portal da Transparência."""
+
     @staticmethod
-    def consultar_cgu_transparencia(cnpj: str, razao_social: str) -> dict:
+    def verificar(cnpj: str, razao_social: str) -> dict:
         api_key = getattr(settings, 'CGU_API_KEY', os.getenv('CGU_API_KEY', ''))
         headers = {"Accept": "application/json"}
         if api_key:
@@ -223,20 +237,19 @@ class CNPJIntelligenceService:
             "lista_processos": processos
         }
 
+
+class CreditRiskService:
+    """Calcula limites de crédito e transação segura com base no Capital Social e Risco."""
+
     @staticmethod
-    def calcular_limite_credito(capital_social: float, nivel_risco: str) -> dict:
-        """
-        Calcula o Limite de Crédito / Transação Seguro com base no Capital Social e Risco.
-        """
+    def calcular(capital_social: float, nivel_risco: str) -> dict:
         if nivel_risco == 'ALTO':
             limite_sugerido = 0.0
             recomendacao = "Bloqueio total de crédito e transações até auditoria presencial."
         elif nivel_risco == 'MÉDIO':
-            # 5% do capital social ou teto de R$ 10.000 para cautela
             limite_sugerido = min(capital_social * 0.05, 10000.0) if capital_social > 0 else 2500.0
             recomendacao = "Liberar transações parciais mediante dupla alçada de aprovação."
         else:
-            # 20% do capital social ou teto de R$ 50.000 para baixo risco
             limite_sugerido = min(capital_social * 0.20, 50000.0) if capital_social > 0 else 15000.0
             recomendacao = "Apto para liberação automática de crédito e recebimento via Pix/BaaS."
 
@@ -245,8 +258,12 @@ class CNPJIntelligenceService:
             "recomendacao_credito": recomendacao
         }
 
+
+class GeminiAIService:
+    """Integração com o Agente de IA do Google Gemini 2.5 Flash."""
+
     @staticmethod
-    def gerar_parecer_ia_google(dados_empresa: dict, compliance_data: dict, credito_data: dict) -> str:
+    def gerar_parecer(dados_empresa: dict, compliance_data: dict, credito_data: dict) -> str:
         gemini_key = getattr(settings, 'GEMINI_API_KEY', os.getenv('GEMINI_API_KEY', ''))
         nivel = compliance_data.get('nivel', 'BAIXO')
         capital = dados_empresa.get('capital_social', 0.0)
@@ -284,6 +301,14 @@ class CNPJIntelligenceService:
             else:
                 return "ALERTA CRÍTICO DE RISCO: Restrições graves em cadastros de sanção ou irregularidade fiscal detectadas. Bloqueio recomendado e due diligence aprofundada necessária."
 
+
+class CNPJIntelligenceService:
+    """Orquestrador principal que unifica todas as regras de negócio e serviços."""
+
+    @staticmethod
+    def validar_cnpj(cnpj: str) -> str:
+        return CNPJValidator.validar(cnpj)
+
     @classmethod
     def consultar_cnpj(cls, cnpj_raw: str, forcar_atualizacao: bool = False) -> EmpresaConsulta:
         cnpj = cls.validar_cnpj(cnpj_raw)
@@ -297,7 +322,7 @@ class CNPJIntelligenceService:
         if not created and not forcar_atualizacao and empresa.atualizado_em >= limite_cache:
             return empresa
 
-        data = cls.consultar_cadastros_com_fallback(cnpj)
+        data = MultiAPIFallbackService.consultar(cnpj)
 
         empresa.razao_social = data.get("razao_social")
         empresa.nome_fantasia = data.get("nome_fantasia")
@@ -325,22 +350,21 @@ class CNPJIntelligenceService:
             if dominio not in ['gmail.com', 'hotmail.com', 'yahoo.com', 'outlook.com', 'terra.com.br']:
                 site = f"https://www.{dominio}"
 
-        infra_analise = cls.analisar_pagamentos_e_infra(site)
+        infra_analise = OSINTPaymentScanner.escanear(site)
         empresa.metodos_pagamento = infra_analise["gateways"]
 
-        compliance = cls.consultar_cgu_transparencia(cnpj, empresa.razao_social)
+        compliance = CGUComplianceService.verificar(cnpj, empresa.razao_social)
 
         if empresa.situacao and empresa.situacao.upper() != 'ATIVA':
             compliance["score"] = max(compliance["score"], 85)
             compliance["nivel"] = "ALTO"
             compliance["motivos"].insert(0, f"Atenção: Situação cadastral na Receita é '{empresa.situacao}'.")
 
-        # Cálculo de Indicadores Econômicos e Limite de Crédito
-        credito_calc = cls.calcular_limite_credito(empresa.capital_social, compliance["nivel"])
+        credito_calc = CreditRiskService.calcular(empresa.capital_social, compliance["nivel"])
         compliance["limite_credito"] = credito_calc["limite_sugerido"]
         compliance["recomendacao_credito"] = credito_calc["recomendacao_credito"]
 
-        parecer_ia = cls.gerar_parecer_ia_google(data, compliance, credito_calc)
+        parecer_ia = GeminiAIService.gerar_parecer(data, compliance, credito_calc)
         compliance["parecer_ia"] = parecer_ia
 
         empresa.compliance_processos = compliance
