@@ -27,7 +27,7 @@
 <body class="h-full flex overflow-hidden">
 
     {% if user.is_authenticated %}
-    <!-- Sidebar (Com Status em Tempo Real das 5 APIs) -->
+    <!-- Sidebar (Treeal Corp) -->
     <aside class="w-72 bg-[#12131a] border-r border-white/5 flex flex-col justify-between hidden lg:flex p-6 shrink-0 shadow-2xl">
         <div>
             <!-- Logo / Brand -->
@@ -82,56 +82,6 @@
             </div>
         </div>
     </aside>
-
-    <script>
-    async function carregarStatusAPIs() {
-        const container = document.getElementById('listaApiStatus');
-        const icone = document.getElementById('iconeRefresh');
-        if (icone) icone.classList.add('fa-spin');
-
-        try {
-            const response = await fetch("{% url 'api_status_check' %}");
-            const data = await response.json();
-
-            let html = '';
-            data.apis.forEach(api => {
-                let corDot = 'bg-emerald-400';
-                let textoStatus = 'Online';
-                let corTexto = 'text-emerald-300';
-
-                if (api.status === 'rate-limit') {
-                    corDot = 'bg-amber-400';
-                    textoStatus = 'Rate Limit';
-                    corTexto = 'text-amber-300';
-                } else if (api.status === 'offline') {
-                    corDot = 'bg-red-500';
-                    textoStatus = 'Offline';
-                    corTexto = 'text-red-400';
-                }
-
-                html += `
-                    <div class="flex items-center justify-between text-xs bg-white/5 px-3 py-2 rounded-xl border border-white/5">
-                        <span class="font-medium text-slate-300">${api.nome}</span>
-                        <div class="flex items-center space-x-1.5">
-                            <span class="w-2 h-2 rounded-full ${corDot} animate-pulse"></span>
-                            <span class="${corTexto} text-[10px] font-bold">${textoStatus}</span>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        } catch (e) {
-            container.innerHTML = `<div class="text-xs text-red-400 py-1 text-center">Erro ao checar status</div>`;
-        } finally {
-            if (icone) icone.classList.remove('fa-spin');
-        }
-    }
-
-    // Carrega ao abrir a página
-    document.addEventListener("DOMContentLoaded", carregarStatusAPIs);
-    // Atualiza a cada 60 segundos automaticamente
-    setInterval(carregarStatusAPIs, 60000);
-    </script>
     {% endif %}
 
     <!-- Main Wrapper -->
@@ -140,14 +90,14 @@
         <!-- Topbar -->
         <header class="h-20 bg-[#0b0c10]/80 backdrop-blur-md border-b border-white/5 px-8 flex justify-between items-center sticky top-0 z-40">
             <div class="flex items-center space-x-4">
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest hidden sm:inline">Plataforma Treeal • Compliance & BaaS</span>
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest hidden sm:inline">Treeal Corp • Compliance & BaaS</span>
             </div>
 
             <!-- Profile & Search Ask Bar -->
             <div class="flex items-center space-x-6">
                 <div class="hidden md:flex items-center bg-white/5 border border-white/10 px-4 py-2 rounded-2xl text-xs text-slate-400 space-x-3">
                     <i class="fa-solid fa-wand-magic-sparkles text-purple-400"></i>
-                    <span>Multi-API Receita & CGU Ativa</span>
+                    <span>5 APIs de Contingência Ativas</span>
                 </div>
 
                 {% if user.is_authenticated %}
@@ -198,9 +148,57 @@
 
         <!-- Footer -->
         <footer class="border-t border-white/5 py-6 px-8 text-center text-xs text-slate-500">
-            ambient de teste treeal v0.1 &bull; 2026
+            Treeal Corp &bull; ambient de teste treeal v0.1 &bull; 2026
         </footer>
     </div>
+
+    <script>
+    async function carregarStatusAPIs() {
+        const container = document.getElementById('listaApiStatus');
+        const icone = document.getElementById('iconeRefresh');
+        if (icone) icone.classList.add('fa-spin');
+
+        try {
+            const response = await fetch("{% url 'api_status_check' %}");
+            const data = await response.json();
+
+            let html = '';
+            data.apis.forEach(api => {
+                let corDot = 'bg-emerald-400';
+                let textoStatus = 'Online';
+                let corTexto = 'text-emerald-300';
+
+                if (api.status === 'rate-limit') {
+                    corDot = 'bg-amber-400';
+                    textoStatus = 'Rate Limit';
+                    corTexto = 'text-amber-300';
+                } else if (api.status === 'offline') {
+                    corDot = 'bg-red-500';
+                    textoStatus = 'Offline';
+                    corTexto = 'text-red-400';
+                }
+
+                html += `
+                    <div class="flex items-center justify-between text-xs bg-white/5 px-3 py-2 rounded-xl border border-white/5">
+                        <span class="font-medium text-slate-300">${api.nome}</span>
+                        <div class="flex items-center space-x-1.5">
+                            <span class="w-2 h-2 rounded-full ${corDot} animate-pulse"></span>
+                            <span class="${corTexto} text-[10px] font-bold">${textoStatus}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        } catch (e) {
+            container.innerHTML = `<div class="text-xs text-red-400 py-1 text-center">Erro ao checar status</div>`;
+        } finally {
+            if (icone) icone.classList.remove('fa-spin');
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", carregarStatusAPIs);
+    setInterval(carregarStatusAPIs, 60000);
+    </script>
 
 </body>
 </html>
