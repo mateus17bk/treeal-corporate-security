@@ -31,7 +31,7 @@
                     <span class="w-2 h-2 rounded-full {% if empresa.situacao == 'ATIVA' %}bg-emerald-400 animate-pulse{% else %}bg-red-400{% endif %}"></span>
                     <span>{{ empresa.situacao|default:"DESCONHECIDA" }}</span>
                 </span>
-                <span class="text-xs text-slate-400 font-mono">Última atualização: {{ empresa.atualizado_em|date:"d/m/Y H:i" }}</span>
+                <span class="text-xs text-slate-400 font-mono">Última varredura: {{ empresa.atualizado_em|date:"d/m/Y H:i" }}</span>
             </div>
             <h1 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">{{ empresa.razao_social|default:"Razão Social não informada" }}</h1>
             {% if empresa.nome_fantasia %}
@@ -49,7 +49,7 @@
     </div>
 </div>
 
-<!-- TEXTO PRONTO PARA COPIAR E ENVIAR PARA A EQUIPE (COMPLIANCE / APROVAÇÃO) -->
+<!-- TEXTO PRONTO PARA COPIAR E ENVIAR PARA A EQUIPE (COM LIMITE DE CRÉDITO E INDICADORES) -->
 <div class="glass-card rounded-3xl p-7 mb-8 shadow-2xl border border-purple-500/30 bg-purple-950/15">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
         <div class="flex items-center space-x-3">
@@ -58,9 +58,9 @@
             </div>
             <div>
                 <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                    <span>Mensagem Pronta para Aprovação de Transação</span>
+                    <span>Mensagem Pronta para Aprovação de Transação (BaaS)</span>
                 </h3>
-                <p class="text-xs text-slate-400">Resumo executivo gerado para envio no canal de aprovação da equipe:</p>
+                <p class="text-xs text-slate-400">Resumo executivo incluindo análise de crédito, limite sugerido e parecer da IA do Google:</p>
             </div>
         </div>
         <button onclick="copiarTextoMensagem()" id="btnCopiar" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-lg shadow-purple-600/30 whitespace-nowrap active:scale-95">
@@ -70,15 +70,16 @@
     </div>
 
     <div class="relative">
-        <textarea id="textoCopiaEquipe" readonly rows="8" class="w-full bg-slate-950 border border-white/10 rounded-2xl p-4 text-xs font-mono text-slate-200 focus:outline-none resize-none shadow-inner">RELATORIO DE DUE DILIGENCE & COMPLIANCE - TREEAL
+        <textarea id="textoCopiaEquipe" readonly rows="10" class="w-full bg-slate-950 border border-white/10 rounded-2xl p-4 text-xs font-mono text-slate-200 focus:outline-none resize-none shadow-inner">RELATÓRIO DE COMPLIANCE & ANÁLISE DE CRÉDITO - TREEAL CORP
 
 Empresa: {{ empresa.razao_social|default:"N/D" }}
 CNPJ: {{ empresa.cnpj }}
-Localidade: {{ empresa.municipio|default:"N/D" }} / {{ empresa.uf|default:"--" }}
-Situacao Receita: {{ empresa.situacao|default:"N/D" }}
+Capital Social: R$ {{ empresa.capital_social|floatformat:2 }}
+Situação Receita: {{ empresa.situacao|default:"N/D" }}
 
 STATUS DE RISCO / FRAUDE: {{ empresa.risk_level }} (Score: {{ empresa.risk_score }}/100)
-Gateways Detectados: {% for gw in empresa.metodos_pagamento %}{{ gw }}{% if not forloop.last %}, {% endif %}{% empty %}Nenhum identificado{% endfor %}
+Limite de Transação Sugerido: R$ {{ empresa.compliance_processos.limite_credito|floatformat:2 }}
+Recomendação de Crédito: {{ empresa.compliance_processos.recomendacao_credito }}
 
 PARECER DE SEGURANÇA PARA APROVAÇÃO:
 {{ empresa.compliance_processos.parecer_ia }}</textarea>
@@ -100,51 +101,35 @@ function copiarTextoMensagem() {
 }
 </script>
 
-<!-- Risk Analysis Banner -->
+<!-- Risk Analysis & Credit Banner -->
 <div class="bg-slate-900 border {% if empresa.risk_level == 'ALTO' %}border-red-500/50 bg-red-950/20{% elif empresa.risk_level == 'MÉDIO' %}border-amber-500/50 bg-amber-950/20{% else %}border-emerald-500/50 bg-emerald-950/20{% endif %} rounded-3xl p-7 mb-8 shadow-2xl">
     <div class="flex items-center space-x-3 mb-4">
         <div class="p-3 rounded-2xl {% if empresa.risk_level == 'ALTO' %}bg-red-500/20 text-red-400 border border-red-500/30{% elif empresa.risk_level == 'MÉDIO' %}bg-amber-500/20 text-amber-400 border border-amber-500/30{% else %}bg-emerald-500/20 text-emerald-400 border border-emerald-500/30{% endif %} text-xl">
             <i class="fa-solid {% if empresa.risk_level == 'ALTO' %}fa-triangle-exclamation{% elif empresa.risk_level == 'MÉDIO' %}fa-scale-balanced{% else %}fa-circle-check{% endif %}"></i>
         </div>
         <div>
-            <h3 class="text-lg font-bold text-white">Parecer de Risco & Compliance</h3>
-            <p class="text-xs text-slate-300">Justificativa automatizada com base em checagens cruzadas da Receita e CGU:</p>
+            <h3 class="text-lg font-bold text-white">Análise Econômica & Limite de Crédito</h3>
+            <p class="text-xs text-slate-300">Cálculo automatizado cruzando Capital Social, Risco e Indicadores de BaaS:</p>
         </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-inner">
-            <span class="text-xs uppercase tracking-wider text-slate-400 font-bold block mb-2"><i class="fa-solid fa-list-check mr-1.5 text-indigo-400"></i> Fatores Identificados:</span>
-            <ul class="space-y-2 text-sm text-slate-200">
-                {% if empresa.compliance_processos.motivos %}
-                    {% for motivo in empresa.compliance_processos.motivos %}
-                    <li class="flex items-start space-x-2">
-                        <i class="fa-solid fa-circle-dot text-xs mt-1.5 {% if empresa.risk_level == 'ALTO' %}text-red-400{% elif empresa.risk_level == 'MÉDIO' %}text-amber-400{% else %}text-emerald-400{% endif %}"></i>
-                        <span>{{ motivo }}</span>
-                    </li>
-                    {% endfor %}
-                {% else %}
-                    <li class="text-slate-400 italic">Nenhum apontamento adverso registrado.</li>
-                {% endif %}
-            </ul>
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-bold block mb-2"><i class="fa-solid fa-wallet mr-1.5 text-emerald-400"></i> Limite Seguro Calculado:</span>
+            <div class="text-2xl font-extrabold text-emerald-400 font-mono mb-2">R$ {{ empresa.compliance_processos.limite_credito|floatformat:2 }}</div>
+            <p class="text-xs text-slate-300 leading-relaxed">{{ empresa.compliance_processos.recomendacao_credito }}</p>
         </div>
 
         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-inner flex flex-col justify-between">
             <div>
-                <span class="text-xs uppercase tracking-wider text-slate-400 font-bold block mb-2"><i class="fa-solid fa-shield-halved mr-1.5 text-indigo-400"></i> Recomendação Operacional:</span>
-                <p class="text-sm text-slate-300 leading-relaxed">
-                    {% if empresa.risk_level == 'ALTO' %}
-                    <strong class="text-red-400">Atenção Crítica:</strong> Constam restrições graves em cadastros federais de sanção ou irregularidade cadastral. Recomendado bloqueio de transações e parcerias comerciais.
-                    {% elif empresa.risk_level == 'MÉDIO' %}
-                    <strong class="text-amber-400">Cautela Recomendada:</strong> Existem apontamentos judiciais ou cíveis pendentes. É aconselhável due diligence detalhada antes de assinar contratos.
-                    {% else %}
-                    <strong class="text-emerald-400">Parceiro Confiável:</strong> CNPJ ativo, regularizado na Receita Federal e sem registros de sanções federais na CGU.
-                    {% endif %}
+                <span class="text-xs uppercase tracking-wider text-slate-400 font-bold block mb-2"><i class="fa-solid fa-shield-halved mr-1.5 text-indigo-400"></i> Parecer da IA do Google:</span>
+                <p class="text-xs text-slate-300 leading-relaxed font-mono bg-slate-900 p-3 rounded-xl border border-slate-800">
+                    "{{ empresa.compliance_processos.parecer_ia }}"
                 </p>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-400 flex justify-between font-mono">
                 <span>Score: <strong class="text-white">{{ empresa.risk_score }}/100</strong></span>
-                <span>Ocorrências: <strong class="text-white">{{ empresa.compliance_processos.total_processos|default:0 }}</strong></span>
+                <span>Capital: <strong class="text-emerald-400">R$ {{ empresa.capital_social|floatformat:2 }}</strong></span>
             </div>
         </div>
     </div>

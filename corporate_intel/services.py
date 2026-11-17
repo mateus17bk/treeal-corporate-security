@@ -40,9 +40,6 @@ class CNPJIntelligenceService:
 
     @staticmethod
     def consultar_cadastros_com_fallback(cnpj: str) -> dict:
-        """
-        Sistema de Contingência Multi-API Expandido (Contém 5 opções públicas em cascata)
-        """
         apis = [
             f"https://brasilapi.com.br/api/cnpj/v1/{cnpj}",
             f"https://minhareceita.org/{cnpj}",
@@ -52,7 +49,7 @@ class CNPJIntelligenceService:
         ]
 
         headers_list = [
-            {"User-Agent": "CorpGuard-Auditor/4.0"},
+            {"User-Agent": "TreealCorp-Auditor/4.1"},
             {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
             {"User-Agent": "TreealBaaS-Compliance/1.0", "Accept": "application/json"}
         ]
@@ -64,7 +61,6 @@ class CNPJIntelligenceService:
                     if resp.status_code == 200:
                         data = resp.json()
 
-                        # Tratamento para ReceitaWS (retorna formato próprio)
                         if "status" in data and data["status"] == "OK":
                             return {
                                 "razao_social": data.get("nome"),
@@ -86,7 +82,6 @@ class CNPJIntelligenceService:
                                 "site": None
                             }
 
-                        # Normalização padrão para as demais APIs
                         normalized = {
                             "razao_social": data.get("razao_social") or data.get("razão_social") or data.get("company", {}).get("name"),
                             "nome_fantasia": data.get("nome_fantasia") or data.get("estabelecimento", {}).get("nome_fantasia") or data.get("alias"),
@@ -98,7 +93,7 @@ class CNPJIntelligenceService:
                             "logradouro": data.get("logradouro") or data.get("estabelecimento", {}).get("tipo_logradouro", "") + " " + data.get("estabelecimento", {}).get("logradouro", ""),
                             "numero": data.get("numero") or data.get("estabelecimento", {}).get("numero"),
                             "bairro": data.get("bairro") or data.get("estabelecimento", {}).get("bairro"),
-                            "municipio": data.get("municipio") or data.get("estabelecimento", {}).get("cidade", {}).get("nome") or data.get("address", {}).get("city"),
+                            "municipio": data.get("municipio") or data.get("estabelecimento", {}).get("estabelecimento", {}).get("cidade", {}).get("nome") or data.get("address", {}).get("city"),
                             "uf": data.get("uf") or data.get("estabelecimento", {}).get("estado", {}).get("sigla") or data.get("address", {}).get("state"),
                             "cep": data.get("cep") or data.get("estabelecimento", {}).get("cep"),
                             "email": data.get("email") or data.get("estabelecimento", {}).get("email"),
@@ -229,27 +224,51 @@ class CNPJIntelligenceService:
         }
 
     @staticmethod
-    def gerar_parecer_ia_google(dados_empresa: dict, compliance_data: dict) -> str:
+    def calcular_limite_credito(capital_social: float, nivel_risco: str) -> dict:
+        """
+        Calcula o Limite de Crédito / Transação Seguro com base no Capital Social e Risco.
+        """
+        if nivel_risco == 'ALTO':
+            limite_sugerido = 0.0
+            recomendacao = "Bloqueio total de crédito e transações até auditoria presencial."
+        elif nivel_risco == 'MÉDIO':
+            # 5% do capital social ou teto de R$ 10.000 para cautela
+            limite_sugerido = min(capital_social * 0.05, 10000.0) if capital_social > 0 else 2500.0
+            recomendacao = "Liberar transações parciais mediante dupla alçada de aprovação."
+        else:
+            # 20% do capital social ou teto de R$ 50.000 para baixo risco
+            limite_sugerido = min(capital_social * 0.20, 50000.0) if capital_social > 0 else 15000.0
+            recomendacao = "Apto para liberação automática de crédito e recebimento via Pix/BaaS."
+
+        return {
+            "limite_sugerido": limite_sugerido,
+            "recomendacao_credito": recomendacao
+        }
+
+    @staticmethod
+    def gerar_parecer_ia_google(dados_empresa: dict, compliance_data: dict, credito_data: dict) -> str:
         gemini_key = getattr(settings, 'GEMINI_API_KEY', os.getenv('GEMINI_API_KEY', ''))
         nivel = compliance_data.get('nivel', 'BAIXO')
+        capital = dados_empresa.get('capital_social', 0.0)
+        limite = credito_data.get('limite_sugerido', 0.0)
 
         if not gemini_key or not GOOGLE_GENAI_AVAILABLE:
             if nivel == 'BAIXO':
-                return "TRANSAÇÃO SEGURA: A empresa possui situação regularizada e sem apontamentos restritivos relevantes. Transação recomendada para aprovação imediata."
+                return f"TRANSAÇÃO SEGURA: Empresa ativa e regular, sem sanções federais. Capital social de R$ {capital:,.2f} compatível com o limite sugerido de R$ {limite:,.2f}. Transação recomendada para aprovação imediata."
             elif nivel == 'MÉDIO':
-                return "ANÁLISE NECESSÁRIA: Foram identificadas ressalvas ou apontamentos cíveis/trabalhistas de médio impacto. Recomendada uma análise detalhada pela equipe antes de efetivar o pagamento."
+                return f"ANÁLISE NECESSÁRIA: Identificadas ressalvas ou apontamentos de médio impacto. Limite de crédito restrito a R$ {limite:,.2f} sob dupla alçada de aprovação da equipe."
             else:
-                return "ALERTA CRÍTICO DE RISCO: A empresa apresenta restrições graves em cadastros de sanção ou irregularidade fiscal. É necessário realizar uma varredura detalhada e due diligence aprofundada antes de qualquer liberação de recursos."
+                return "ALERTA CRÍTICO DE RISCO: Restrições graves em cadastros de sanção ou irregularidade fiscal detectadas. Bloqueio recomendado e due diligence aprofundada necessária."
 
         try:
             client = genai.Client(api_key=gemini_key)
             prompt = f"""
-            Atue como um Especialista Sênior de Compliance e Prevenção a Fraudes em meios de pagamento (BaaS - Treeal).
-            Redija um resumo executivo objetivo (exatamente 2 linhas, sem emojis, sem introduções) para a equipe de operações decidir se aprova, analisa ou bloqueia a transação com base nestes dados:
-            - Razão Social: {dados_empresa.get('razao_social')}
-            - CNPJ: {dados_empresa.get('cnpj')}
-            - Situação: {dados_empresa.get('situacao')}
-            - Risco Calculado: {nivel} (Score {compliance_data.get('score')}/100)
+            Atue como um Especialista Sênior de Compliance e Risco de Crédito em BaaS (Treeal Corp).
+            Redija um parecer executivo profissional e direto (exatamente 2 linhas, sem emojis, sem introduções) para a equipe de operações decidir a liberação da transação com base nestes dados:
+            - Empresa: {dados_empresa.get('razao_social')} (CNPJ: {dados_empresa.get('cnpj')})
+            - Situação: {dados_empresa.get('situacao')} | Capital Social: R$ {capital:,.2f}
+            - Risco: {nivel} (Score {compliance_data.get('score')}/100)
+            - Limite Sugerido: R$ {limite:,.2f}
             - Motivos/Sanções: {compliance_data.get('motivos')}
             """
             response = client.models.generate_content(
@@ -259,17 +278,24 @@ class CNPJIntelligenceService:
             return response.text.strip()
         except Exception:
             if nivel == 'BAIXO':
-                return "TRANSAÇÃO SEGURA: A empresa possui situação regularizada e sem apontamentos restritivos relevantes. Transação recomendada para aprovação imediata."
+                return f"TRANSAÇÃO SEGURA: Empresa ativa e regular, sem sanções federais. Capital social de R$ {capital:,.2f} compatível com o limite sugerido de R$ {limite:,.2f}. Transação recomendada para aprovação imediata."
             elif nivel == 'MÉDIO':
-                return "ANÁLISE NECESSÁRIA: Foram identificadas ressalvas ou apontamentos cíveis/trabalhistas de médio impacto. Recomendada uma análise detalhada pela equipe antes de efetivar o pagamento."
+                return f"ANÁLISE NECESSÁRIA: Identificadas ressalvas ou apontamentos de médio impacto. Limite de crédito restrito a R$ {limite:,.2f} sob dupla alçada de aprovação da equipe."
             else:
-                return "ALERTA CRÍTICO DE RISCO: A empresa apresenta restrições graves em cadastros de sanção ou irregularidade fiscal. É necessário realizar uma varredura detalhada e due diligence aprofundada antes de qualquer liberação de recursos."
+                return "ALERTA CRÍTICO DE RISCO: Restrições graves em cadastros de sanção ou irregularidade fiscal detectadas. Bloqueio recomendado e due diligence aprofundada necessária."
 
     @classmethod
-    def consultar_cnpj(cls, cnpj_raw: str) -> EmpresaConsulta:
+    def consultar_cnpj(cls, cnpj_raw: str, forcar_atualizacao: bool = False) -> EmpresaConsulta:
         cnpj = cls.validar_cnpj(cnpj_raw)
 
         empresa, created = EmpresaConsulta.objects.get_or_create(cnpj=cnpj)
+
+        from django.utils import timezone
+        from datetime import timedelta
+        limite_cache = timezone.now() - timedelta(days=7)
+
+        if not created and not forcar_atualizacao and empresa.atualizado_em >= limite_cache:
+            return empresa
 
         data = cls.consultar_cadastros_com_fallback(cnpj)
 
@@ -309,7 +335,12 @@ class CNPJIntelligenceService:
             compliance["nivel"] = "ALTO"
             compliance["motivos"].insert(0, f"Atenção: Situação cadastral na Receita é '{empresa.situacao}'.")
 
-        parecer_ia = cls.gerar_parecer_ia_google(data, compliance)
+        # Cálculo de Indicadores Econômicos e Limite de Crédito
+        credito_calc = cls.calcular_limite_credito(empresa.capital_social, compliance["nivel"])
+        compliance["limite_credito"] = credito_calc["limite_sugerido"]
+        compliance["recomendacao_credito"] = credito_calc["recomendacao_credito"]
+
+        parecer_ia = cls.gerar_parecer_ia_google(data, compliance, credito_calc)
         compliance["parecer_ia"] = parecer_ia
 
         empresa.compliance_processos = compliance
