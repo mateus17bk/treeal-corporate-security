@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR" class="h-full bg-[#0b0c10]">
 <head>
@@ -10,62 +11,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0c10; color: #e2e8f0; }
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
-        .glass-card {
-            background: linear-gradient(135deg, rgba(26, 27, 38, 0.75) 0%, rgba(18, 19, 26, 0.85) 100%);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-        }
-        .sidebar-item-active {
-            background: linear-gradient(90deg, rgba(139, 92, 246, 0.25) 0%, rgba(217, 70, 239, 0.1) 100%);
-            border-left: 3px solid #a855f7;
-        }
-
-        /* Estilos especiais para Impressão e PDF */
-        @media print {
-            body {
-                background-color: #ffffff !important;
-                color: #0f172a !important;
-                overflow: visible !important;
-            }
-            aside, header, footer, button, a, .no-print {
-                display: none !important;
-            }
-            .flex-1 {
-                overflow: visible !important;
-                display: block !important;
-            }
-            main {
-                padding: 0 !important;
-                margin: 0 !important;
-                max-width: 100% !important;
-            }
-            .glass-card, div {
-                background: #ffffff !important;
-                color: #0f172a !important;
-                border: 1px solid #cbd5e1 !important;
-                box-shadow: none !important;
-                backdrop-filter: none !important;
-            }
-            h1, h2, h3, p, span, strong, th, td {
-                color: #0f172a !important;
-            }
-            textarea {
-                background: #f8fafc !important;
-                color: #0f172a !important;
-                border: 1px solid #cbd5e1 !important;
-            }
-            table {
-                page-break-inside: auto;
-            }
-            tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
-            }
-        }
-    </style>
+    <!-- CSS Estilizado Organizado -->
+    <link rel="stylesheet" href="{% static 'css/treeal.css' %}">
 </head>
 <body class="h-full flex overflow-hidden">
 
@@ -195,53 +142,7 @@
         </footer>
     </div>
 
-    <script>
-    async function carregarStatusAPIs() {
-        const container = document.getElementById('listaApiStatus');
-        const icone = document.getElementById('iconeRefresh');
-        if (icone) icone.classList.add('fa-spin');
-
-        try {
-            const response = await fetch("{% url 'api_status_check' %}");
-            const data = await response.json();
-
-            let html = '';
-            data.apis.forEach(api => {
-                let corDot = 'bg-emerald-400';
-                let textoStatus = 'Online';
-                let corTexto = 'text-emerald-300';
-
-                if (api.status === 'rate-limit') {
-                    corDot = 'bg-amber-400';
-                    textoStatus = 'Rate Limit';
-                    corTexto = 'text-amber-300';
-                } else if (api.status === 'offline') {
-                    corDot = 'bg-red-500';
-                    textoStatus = 'Offline';
-                    corTexto = 'text-red-400';
-                }
-
-                html += `
-                    <div class="flex items-center justify-between text-xs bg-white/5 px-3 py-2 rounded-xl border border-white/5">
-                        <span class="font-medium text-slate-300">${api.nome}</span>
-                        <div class="flex items-center space-x-1.5">
-                            <span class="w-2 h-2 rounded-full ${corDot} animate-pulse"></span>
-                            <span class="${corTexto} text-[10px] font-bold">${textoStatus}</span>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        } catch (e) {
-            container.innerHTML = `<div class="text-xs text-red-400 py-1 text-center">Erro ao checar status</div>`;
-        } finally {
-            if (icone) icone.classList.remove('fa-spin');
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", carregarStatusAPIs);
-    setInterval(carregarStatusAPIs, 60000);
-    </script>
-
+    <!-- JS Organizado Externo -->
+    <script src="{% static 'js/treeal.js' %}"></script>
 </body>
 </html>

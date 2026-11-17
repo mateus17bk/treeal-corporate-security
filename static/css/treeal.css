@@ -1,0 +1,95 @@
+/* ==========================================================================
+   Treeal Corp Design System & Custom Styles
+   ========================================================================== */
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #0b0c10;
+    color: #e2e8f0;
+}
+
+.font-mono {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.glass-card {
+    background: linear-gradient(135deg, rgba(26, 27, 38, 0.75) 0%, rgba(18, 19, 26, 0.85) 100%);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.sidebar-item-active {
+    background: linear-gradient(90deg, rgba(139, 92, 246, 0.25) 0%, rgba(217, 70, 239, 0.1) 100%);
+    border-left: 3px solid #a855f7;
+}
+
+/* Formulários e Inputs */
+input[type="text"], input[type="password"], input[type="email"] {
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #ffffff;
+    font-size: 0.875rem;
+    outline: none;
+    transition: all 0.2s;
+}
+
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
+    border-color: #a855f7;
+    box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+}
+
+ul.errorlist {
+    color: #f87171;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    list-style: none;
+    padding: 0;
+}
+
+/* ==========================================================================
+   Regras de Impressão e Exportação em PDF (@media print)
+   ========================================================================== */
+@media print {
+    body {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        overflow: visible !important;
+    }
+    aside, header, footer, button, a, .no-print {
+        display: none !important;
+    }
+    .flex-1 {
+        overflow: visible !important;
+        display: block !important;
+    }
+    main {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+    }
+    .glass-card, div {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+    }
+    h1, h2, h3, p, span, strong, th, td {
+        color: #0f172a !important;
+    }
+    textarea {
+        background: #f8fafc !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+    table {
+        page-break-inside: auto;
+    }
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+}
