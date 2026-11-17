@@ -9,6 +9,10 @@
         <span>Voltar ao Dashboard</span>
     </a>
     <div class="flex space-x-3">
+        <a href="?atualizar=1" class="bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 px-4.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-sm">
+            <i class="fa-solid fa-rotate"></i>
+            <span>Forçar Atualização (Re-scan)</span>
+        </a>
         <button onclick="window.print()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 px-4.5 py-2.5 rounded-xl text-sm font-semibold transition flex items-center space-x-2 shadow-sm">
             <i class="fa-solid fa-print"></i>
             <span>Exportar Resumo (PDF)</span>
@@ -27,6 +31,7 @@
                     <span class="w-2 h-2 rounded-full {% if empresa.situacao == 'ATIVA' %}bg-emerald-400 animate-pulse{% else %}bg-red-400{% endif %}"></span>
                     <span>{{ empresa.situacao|default:"DESCONHECIDA" }}</span>
                 </span>
+                <span class="text-xs text-slate-400 font-mono">Última atualização: {{ empresa.atualizado_em|date:"d/m/Y H:i" }}</span>
             </div>
             <h1 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">{{ empresa.razao_social|default:"Razão Social não informada" }}</h1>
             {% if empresa.nome_fantasia %}

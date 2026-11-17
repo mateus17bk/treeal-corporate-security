@@ -36,8 +36,9 @@ def models_q_cnpj_or_name(query):
 def consultar_cnpj_view(request):
     if request.method == 'POST':
         cnpj_input = request.POST.get('cnpj', '').strip()
+        forcar = request.POST.get('forcar', 'false') == 'true'
         try:
-            empresa = CNPJIntelligenceService.consultar_cnpj(cnpj_input)
+            empresa = CNPJIntelligenceService.consultar_cnpj(cnpj_input, forcar_atualizacao=forcar)
             messages.success(request, f"CNPJ {empresa.cnpj} consultado e analisado com sucesso!")
             return redirect('detalhes_empresa', pk=empresa.pk)
         except ValidationError as e:
@@ -49,6 +50,15 @@ def consultar_cnpj_view(request):
 
 def detalhes_empresa_view(request, pk):
     empresa = get_object_or_404(EmpresaConsulta, pk=pk)
+    # Permite forçar atualização via parâmetro GET ?atualizar=1
+    if request.GET.get('atualizar') == '1':
+        try:
+            empresa = CNPJIntelligenceService.consultar_cnpj(empresa.cnpj, forcar_atualizacao=True)
+            messages.success(request, "Dados atualizados com sucesso via APIs externas!")
+            return redirect('detalhes_empresa', pk=empresa.pk)
+        except Exception as e:
+            messages.error(request, f"Não foi possível atualizar agora: {e}")
+
     context = {
         'empresa': empresa
     }
