@@ -1,5 +1,5 @@
 /**
- * Treeal Corp - Scripts Globais (Status de APIs e Área de Transferência)
+ * Treeal Corp - Scripts Globais & Efeitos Visuais Interativos (Frontend Agent)
  */
 
 async function carregarStatusAPIs() {
@@ -62,9 +62,26 @@ function copiarTextoMensagem() {
     });
 }
 
+/**
+ * Efeito translúcido dinâmico com mouse tracking (Spotlight / Glass Glow)
+ */
+function inicializarEfeitoTranslúcidoMouse() {
+    document.querySelectorAll('.glass-card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+        });
+    });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById('listaApiStatus')) {
         carregarStatusAPIs();
         setInterval(carregarStatusAPIs, 60000);
     }
+    inicializarEfeitoTranslúcidoMouse();
 });

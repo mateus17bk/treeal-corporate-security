@@ -4,11 +4,11 @@
 
 {% block content %}
 <!-- Treeal DS Hero Banner -->
-<div class="relative bg-gradient-to-r from-blue-900/40 via-slate-900 to-slate-900 border border-slate-800 rounded-2xl p-8 md:p-12 mb-8 shadow-2xl overflow-hidden">
-    <div class="absolute right-0 top-0 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="glass-card relative rounded-3xl p-8 md:p-12 mb-8 shadow-2xl overflow-hidden">
+    <div class="absolute right-0 top-0 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
     <div class="max-w-3xl relative z-10">
-        <div class="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-500/30 text-blue-400 px-3.5 py-1 rounded-full text-xs font-bold mb-4 uppercase tracking-wider">
+        <div class="inline-flex items-center space-x-2 bg-purple-500/10 border border-purple-500/30 text-purple-300 px-3.5 py-1 rounded-full text-xs font-bold mb-4 uppercase tracking-wider">
             <i class="fa-solid fa-layer-group"></i>
             <span>Treeal Design System Component</span>
         </div>
@@ -22,16 +22,16 @@
         </p>
 
         <!-- Treeal DS Search Form -->
-        <form action="{% url 'consultar_cnpj' %}" method="POST" class="bg-slate-900 border border-slate-700 p-2 rounded-xl shadow-lg flex flex-col sm:flex-row gap-2">
+        <form action="{% url 'consultar_cnpj' %}" method="POST" class="glass-card p-2 rounded-2xl shadow-lg flex flex-col sm:flex-row gap-2">
             {% csrf_token %}
             <div class="relative flex-grow">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-blue-500">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-purple-400">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </span>
                 <input type="text" name="cnpj" placeholder="Digite o CNPJ (ex: 60.701.190/0001-04)" required
-                    class="w-full pl-12 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-600 font-mono text-sm">
+                    class="w-full pl-12 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 font-mono text-sm">
             </div>
-            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-7 py-3 rounded-lg font-bold text-sm transition flex items-center justify-center space-x-2 shadow-md shadow-blue-600/30">
+            <button type="submit" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-7 py-3 rounded-xl font-bold text-sm transition flex items-center justify-center space-x-2 shadow-md shadow-purple-600/30">
                 <span>Investigar CNPJ</span>
             </button>
         </form>
@@ -40,16 +40,16 @@
 
 <!-- Treeal DS Metrics Grid -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <div class="bg-[#1e293b] border border-slate-700/80 rounded-2xl p-6 shadow-xl flex items-center justify-between">
+    <div class="glass-card rounded-2xl p-6 shadow-xl flex items-center justify-between">
         <div>
             <p class="text-xs uppercase tracking-wider text-slate-400 font-bold">Total Consultas</p>
             <h3 class="text-3xl font-extrabold text-white mt-1 font-mono">{{ total_consultas }}</h3>
         </div>
-        <div class="bg-blue-500/10 text-blue-400 p-3.5 rounded-xl border border-blue-500/20 text-lg">
+        <div class="bg-purple-500/10 text-purple-400 p-3.5 rounded-xl border border-purple-500/20 text-lg">
             <i class="fa-solid fa-database"></i>
         </div>
     </div>
-    <div class="bg-[#1e293b] border border-slate-700/80 rounded-2xl p-6 shadow-xl flex items-center justify-between">
+    <div class="glass-card rounded-2xl p-6 shadow-xl flex items-center justify-between">
         <div>
             <p class="text-xs uppercase tracking-wider text-red-400 font-bold">Risco Alto</p>
             <h3 class="text-3xl font-extrabold text-red-400 mt-1 font-mono">{{ risco_alto }}</h3>
@@ -58,7 +58,7 @@
             <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
     </div>
-    <div class="bg-[#1e293b] border border-slate-700/80 rounded-2xl p-6 shadow-xl flex items-center justify-between">
+    <div class="glass-card rounded-2xl p-6 shadow-xl flex items-center justify-between">
         <div>
             <p class="text-xs uppercase tracking-wider text-amber-400 font-bold">Risco Médio</p>
             <h3 class="text-3xl font-extrabold text-amber-400 mt-1 font-mono">{{ risco_medio }}</h3>
@@ -67,7 +67,7 @@
             <i class="fa-solid fa-scale-balanced"></i>
         </div>
     </div>
-    <div class="bg-[#1e293b] border border-slate-700/80 rounded-2xl p-6 shadow-xl flex items-center justify-between">
+    <div class="glass-card rounded-2xl p-6 shadow-xl flex items-center justify-between">
         <div>
             <p class="text-xs uppercase tracking-wider text-emerald-400 font-bold">Seguros</p>
             <h3 class="text-3xl font-extrabold text-emerald-400 mt-1 font-mono">{{ risco_baixo }}</h3>
@@ -79,19 +79,19 @@
 </div>
 
 <!-- Treeal DS Table -->
-<div class="bg-[#1e293b] border border-slate-700/80 rounded-2xl shadow-xl overflow-hidden mb-12">
-    <div class="px-6 py-5 border-b border-slate-700 flex justify-between items-center bg-slate-850">
+<div class="glass-card rounded-3xl shadow-xl overflow-hidden mb-12">
+    <div class="px-6 py-5 border-b border-white/5 flex justify-between items-center bg-black/20">
         <div class="flex items-center space-x-3">
-            <div class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse"></div>
             <h3 class="font-bold text-sm text-white uppercase tracking-wider">Auditorias Recentes (Treeal DS)</h3>
         </div>
-        <a href="{% url 'historico' %}" class="text-xs text-blue-400 hover:text-blue-300 font-bold transition">Ver histórico &rarr;</a>
+        <a href="{% url 'historico' %}" class="text-xs text-purple-400 hover:text-purple-300 font-bold transition">Ver histórico &rarr;</a>
     </div>
 
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="bg-slate-900/60 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-700">
+                <tr class="bg-black/40 text-slate-400 text-xs uppercase tracking-wider border-b border-white/5">
                     <th class="py-3.5 px-6 font-semibold">CNPJ / Razão Social</th>
                     <th class="py-3.5 px-6 font-semibold">Localidade</th>
                     <th class="py-3.5 px-6 font-semibold">Situação</th>
@@ -100,9 +100,9 @@
                     <th class="py-3.5 px-6 font-semibold text-right">Ação</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-700/60 text-sm">
+            <tbody class="divide-y divide-white/5 text-sm">
                 {% for emp in empresas %}
-                <tr class="hover:bg-slate-750/50 transition">
+                <tr class="hover:bg-purple-500/10 transition">
                     <td class="py-3.5 px-6">
                         <span class="font-mono font-bold text-white block text-xs">{{ emp.cnpj }}</span>
                         <span class="text-xs text-slate-400 block">{{ emp.razao_social|truncatechars:40 }}</span>
@@ -123,14 +123,14 @@
                     <td class="py-3.5 px-6">
                         <div class="flex flex-wrap gap-1">
                             {% for gw in emp.metodos_pagamento %}
-                            <span class="bg-slate-900 border border-slate-700 text-[10px] px-2 py-0.5 rounded text-blue-300">{{ gw }}</span>
+                            <span class="bg-black/30 border border-white/5 text-[10px] px-2 py-0.5 rounded text-purple-300">{{ gw }}</span>
                             {% empty %}
                             <span class="text-xs text-slate-500 italic">--</span>
                             {% endfor %}
                         </div>
                     </td>
                     <td class="py-3.5 px-6 text-right">
-                        <a href="{% url 'detalhes_empresa' emp.pk %}" class="bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition border border-blue-500/30">
+                        <a href="{% url 'detalhes_empresa' emp.pk %}" class="bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition border border-purple-500/30">
                             Resumo
                         </a>
                     </td>
