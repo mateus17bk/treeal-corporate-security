@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Página não encontrada (404) • Treeal DS{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto mt-16 text-center">
+    <div class="glass-card rounded-3xl p-10 shadow-2xl border border-white/10 relative overflow-hidden">
+
+        <!-- Background Glow -->
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="flex justify-center mb-6">
+            <div class="w-20 h-20 rounded-3xl bg-purple-600/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-3xl shadow-inner">
+                <i class="fa-solid fa-compass-drafting"></i>
+            </div>
+        </div>
+
+        <h1 class="text-3xl font-extrabold text-white tracking-tight mb-2">Página Não Encontrada</h1>
+        <p class="text-sm text-slate-400 mb-8 max-w-sm mx-auto leading-relaxed">
+            O recurso ou endereço que você está procurando não existe, foi movido ou você não possui permissão de acesso.
+        </p>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a href="{% url 'dashboard' %}" class="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white py-3.5 px-6 rounded-xl font-bold text-sm transition shadow-lg shadow-purple-600/30 flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-house"></i>
+                <span>Voltar ao Dashboard</span>
+            </a>
+            <a href="{% url 'login' %}" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 py-3.5 px-6 rounded-xl font-bold text-sm transition flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                <span>Fazer Login</span>
+            </a>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-white/5 text-[11px] text-slate-500 font-mono">
+            TREEAL CORP &bull; SEGURANÇA E COMPLIANCE BANCÁRIO &bull; ERRO 404
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -50,7 +50,6 @@ def consultar_cnpj_view(request):
 
 def detalhes_empresa_view(request, pk):
     empresa = get_object_or_404(EmpresaConsulta, pk=pk)
-    # Permite forçar atualização via parâmetro GET ?atualizar=1
     if request.GET.get('atualizar') == '1':
         try:
             empresa = CNPJIntelligenceService.consultar_cnpj(empresa.cnpj, forcar_atualizacao=True)
@@ -91,3 +90,6 @@ def registrar_usuario_view(request):
 class CustomLoginView(LoginView):
     template_name = 'corporate_intel/login.html'
     redirect_authenticated_user = True
+
+def custom_page_not_found_view(request, exception):
+    return render(request, 'corporate_intel/404.html', status=404)
