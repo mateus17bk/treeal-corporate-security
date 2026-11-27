@@ -49,7 +49,15 @@ def consultar_cnpj_view(request):
     return redirect('dashboard')
 
 def detalhes_empresa_view(request, pk):
-    empresa = get_object_or_404(EmpresaConsulta, pk=pk)
+    try:
+        empresa = EmpresaConsulta.objects.get(pk=pk)
+    except EmpresaConsulta.DoesNotExist:
+        empresa = EmpresaConsulta.objects.first()
+        if not empresa:
+            messages.error(request, "Nenhuma empresa cadastrada no sistema.")
+            return redirect('dashboard')
+        return redirect('detalhes_empresa', pk=empresa.pk)
+
     if request.GET.get('atualizar') == '1':
         try:
             empresa = CNPJIntelligenceService.consultar_cnpj(empresa.cnpj, forcar_atualizacao=True)

@@ -49,18 +49,18 @@
     </div>
 </div>
 
-<!-- TEXTO PRONTO PARA COPIAR E ENVIAR PARA A EQUIPE (COM LIMITE DE CRÉDITO E INDICADORES) -->
+<!-- TEXTO PRONTO PARA COPIAR E ENVIAR PARA A EQUIPE (MENSAGEM DE APROVAÇÃO PIX / BAAS) -->
 <div class="glass-card rounded-3xl p-7 mb-8 shadow-2xl border border-purple-500/30 bg-purple-950/15">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
         <div class="flex items-center space-x-3">
             <div class="p-3 rounded-2xl bg-purple-500/20 text-purple-400 border border-purple-500/30 text-xl">
-                <i class="fa-solid fa-copy"></i>
+                <i class="fa-solid fa-file-invoice-dollar"></i>
             </div>
             <div>
                 <h3 class="text-lg font-bold text-white flex items-center gap-2">
                     <span>Mensagem Pronta para Aprovação de Transação (BaaS)</span>
                 </h3>
-                <p class="text-xs text-slate-400">Resumo executivo incluindo análise de crédito, limite sugerido e parecer da IA do Google:</p>
+                <p class="text-xs text-slate-400">Informe os dados da transação Pix abaixo para gerar automaticamente a mensagem estruturada para a equipe:</p>
             </div>
         </div>
         <button onclick="copiarTextoMensagem()" id="btnCopiar" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-lg shadow-purple-600/30 whitespace-nowrap active:scale-95">
@@ -69,28 +69,83 @@
         </button>
     </div>
 
+    <!-- Inputs interativos para preencher a transação Pix -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
+        <div>
+            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Valor do Pix (R$)</label>
+            <input type="text" id="inputValorPix" value="50.000,00" oninput="atualizarMensagemPix()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-purple-500">
+        </div>
+        <div>
+            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Empresa Pagadora</label>
+            <input type="text" id="inputEmpresaPagadora" value="Treeal Tecnologia e Pagamentos S.A." oninput="atualizarMensagemPix()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-purple-500">
+        </div>
+        <div>
+            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Conta Pagadora / ID</label>
+            <input type="text" id="inputContaPagadora" value="CC-88231-9" oninput="atualizarMensagemPix()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-purple-500">
+        </div>
+    </div>
+
     <div class="relative">
-        <textarea id="textoCopiaEquipe" readonly rows="10" class="w-full bg-slate-950 border border-white/10 rounded-2xl p-4 text-xs font-mono text-slate-200 focus:outline-none resize-none shadow-inner">RELATÓRIO DE COMPLIANCE & ANÁLISE DE CRÉDITO - TREEAL CORP
+        <textarea id="textoCopiaEquipe" readonly rows="14" class="w-full bg-slate-950 border border-white/10 rounded-2xl p-4 text-xs font-mono text-slate-200 focus:outline-none resize-none shadow-inner">Por gentileza, avaliar e aprovar o Pix de R$ 50.000,00, enviado pela empresa Treeal Tecnologia e Pagamentos S.A., conta CC-88231-9, destinado à empresa {{ empresa.razao_social|default:"N/D" }}, CNPJ {{ empresa.cnpj }}{% if empresa.nome_fantasia %}, nome fantasia {{ empresa.nome_fantasia }}{% endif %}.
 
-Empresa: {{ empresa.razao_social|default:"N/D" }}
-CNPJ: {{ empresa.cnpj }}
-Capital Social: R$ {{ empresa.capital_social|floatformat:2 }}
-Situação Receita: {{ empresa.situacao|default:"N/D" }}
+A empresa pagadora atua com intermediação de negócios, infraestrutura financeira, processamento de pagamentos, Pix e soluções tecnológicas.
 
-STATUS DE RISCO / FRAUDE: {{ empresa.risk_level }} (Score: {{ empresa.risk_score }}/100)
-Limite de Transação Sugerido: R$ {{ empresa.compliance_processos.limite_credito|floatformat:2 }}
-Recomendação de Crédito: {{ empresa.compliance_processos.recomendacao_credito }}
+A empresa destinatária encontra-se com situação cadastral {{ empresa.situacao|default:"ATIVA" }}, CNPJ {{ empresa.cnpj }}, e atua no segmento de {{ empresa.natureza_juridica|default:"Serviços Empresariais e Tecnologia" }}, desenvolvendo atividades relacionadas a {{ empresa.atividade_principal|default:"Atividades econômicas cadastradas na Receita Federal" }}.
 
-PARECER DE SEGURANÇA PARA APROVAÇÃO:
-{{ empresa.compliance_processos.parecer_ia }}</textarea>
+As atividades das empresas apresentam relação com serviços financeiros, tecnologia, consultoria e intermediação de negócios.
+
+ANÁLISE DE COMPATIBILIDADE E COMPLIANCE:
+- Capital Social: R$ {{ empresa.capital_social|floatformat:2 }}
+- Classificação de Risco: {{ empresa.risk_level }} (Score: {{ empresa.risk_score }}/100)
+- Limite de Transação Sugerido: R$ {{ empresa.compliance_processos.limite_credito|floatformat:2 }}
+- Parecer de Segurança: {{ empresa.compliance_processos.parecer_ia }}</textarea>
     </div>
 </div>
 
 <script>
+function atualizarMensagemPix() {
+    const valor = document.getElementById('inputValorPix').value || '50.000,00';
+    const pagadora = document.getElementById('inputEmpresaPagadora').value || 'Treeal Tecnologia e Pagamentos S.A.';
+    const conta = document.getElementById('inputContaPagadora').value || 'CC-88231-9';
+    const razaoSocial = "{{ empresa.razao_social|default:'N/D' }}";
+    const nomeFantasia = "{{ empresa.nome_fantasia|default:'' }}";
+    const cnpj = "{{ empresa.cnpj }}";
+    const situacao = "{{ empresa.situacao|default:'ATIVA' }}";
+    const natureza = "{{ empresa.natureza_juridica|default:'Serviços Empresariais e Tecnologia' }}";
+    const atividade = "{{ empresa.atividade_principal|default:'Atividades principais e secundárias cadastradas na Receita Federal' }}";
+    const risco = "{{ empresa.risk_level }}";
+    const score = "{{ empresa.risk_score }}";
+    const limite = "{{ empresa.compliance_processos.limite_credito|floatformat:2 }}";
+    const capital = "{{ empresa.capital_social|floatformat:2 }}";
+    const parecer = "{{ empresa.compliance_processos.parecer_ia|escapejs }}";
+
+    let fantasiaStr = nomeFantasia ? `, nome fantasia ${nomeFantasia}` : '';
+
+    const texto = `Por gentileza, avaliar e aprovar o Pix de R$ ${valor}, enviado pela empresa ${pagadora}, conta ${conta}, destinado à empresa ${razaoSocial}, CNPJ ${cnpj}${fantasiaStr}.
+
+A empresa pagadora atua com intermediação de negócios, infraestrutura financeira, processamento de pagamentos, Pix e soluções tecnológicas.
+
+A empresa destinatária encontra-se com situação cadastral ${situacao}, CNPJ ${cnpj}, e atua no segmento de ${natureza}, desenvolvendo atividades relacionadas a ${atividade}.
+
+As atividades das empresas apresentam relação com serviços financeiros, tecnologia, consultoria e intermediação de negócios.
+
+ANÁLISE DE COMPATIBILIDADE E COMPLIANCE:
+- Capital Social: R$ ${capital}
+- Classificação de Risco: ${risco} (Score: ${score}/100)
+- Limite Sugerido: R$ ${limite}
+- Parecer de Segurança: ${parecer}`;
+
+    document.getElementById('textoCopiaEquipe').value = texto;
+}
+
 function copiarTextoMensagem() {
     const textarea = document.getElementById('textoCopiaEquipe');
+    textarea.removeAttribute('readonly');
     textarea.select();
     textarea.setSelectionRange(0, 99999);
+    try {
+        document.execCommand('copy');
+    } catch (e) {}
     navigator.clipboard.writeText(textarea.value).then(() => {
         const btn = document.getElementById('textoBotaoCopiar');
         btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Copiado com Sucesso!';
@@ -98,6 +153,7 @@ function copiarTextoMensagem() {
             btn.innerHTML = '<i class="fa-solid fa-clone mr-1"></i> Copiar Mensagem';
         }, 2500);
     });
+    textarea.setAttribute('readonly', 'true');
 }
 </script>
 

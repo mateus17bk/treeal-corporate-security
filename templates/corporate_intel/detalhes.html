@@ -69,24 +69,95 @@
         </button>
     </div>
 
+    <!-- Campos interativos para dados do Pix da Origem -->
+    <div class="bg-slate-950/60 p-5 rounded-2xl border border-white/5 mb-4 space-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1"><i class="fa-solid fa-money-bill-wave text-emerald-400 mr-1"></i> Valor do Pix (R$)</label>
+                <input type="text" id="inputValor" placeholder="Ex: 50.000,00" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500 font-mono">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1"><i class="fa-solid fa-user text-indigo-400 mr-1"></i> Pagador (Origem - Nome)</label>
+                <input type="text" id="inputOrigemNome" placeholder="Ex: Empresa X Ltda" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500 font-mono">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1"><i class="fa-solid fa-id-card text-blue-400 mr-1"></i> CNPJ do Pagador</label>
+                <input type="text" id="inputOrigemCnpj" placeholder="Ex: 00.000.000/0001-00" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500 font-mono">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1"><i class="fa-solid fa-building-columns text-amber-400 mr-1"></i> Conta / Banco Origem</label>
+                <input type="text" id="inputOrigemConta" placeholder="Ex: Ag: 0001 Cc: 12345-6 (Itaú)" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500 font-mono">
+            </div>
+        </div>
+        <div class="flex justify-end">
+            <button onclick="atualizarMensagemPix()" type="button" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-md">
+                <i class="fa-solid fa-arrow-down"></i>
+                <span>Aplicar Informações na Mensagem</span>
+            </button>
+        </div>
+    </div>
+
     <div class="relative">
-        <textarea id="textoCopiaEquipe" readonly rows="10" class="w-full bg-slate-950 border border-white/10 rounded-2xl p-4 text-xs font-mono text-slate-200 focus:outline-none resize-none shadow-inner">RELATÓRIO DE COMPLIANCE & ANÁLISE DE CRÉDITO - TREEAL CORP
+        <textarea id="textoCopiaEquipe" readonly rows="18" class="w-full bg-slate-950 border border-white/10 rounded-2xl p-4 text-xs font-mono text-slate-200 focus:outline-none resize-none shadow-inner">{% if empresa.risk_level == 'ALTO' or empresa.risk_level == 'MÉDIO' %}⚠️ ATENÇÃO: ANÁLISE DE RISCO {{ empresa.risk_level }} — REQUER DUPLA ALÇADA ⚠️
+{% endif %}
+Por gentileza, aprovar a transação Pix:
+- Valor: R$ <span id="lblValor">[Informe o Valor]</span>
+- Pagador (Origem): <span id="lblOrigemNome">[Nome da Origem]</span> (CNPJ: <span id="lblOrigemCnpj">[CNPJ Origem]</span>) — Conta: <span id="lblOrigemConta">[Conta/Banco]</span>
 
-Empresa: {{ empresa.razao_social|default:"N/D" }}
-CNPJ: {{ empresa.cnpj }}
-Capital Social: R$ {{ empresa.capital_social|floatformat:2 }}
-Situação Receita: {{ empresa.situacao|default:"N/D" }}
+Empresa Beneficiária (Destinatária):
+- Razão Social: {{ empresa.razao_social|default:"N/D" }}
+- Nome Fantasia: {{ empresa.nome_fantasia|default:"N/D" }}
+- CNPJ: {{ empresa.cnpj }}
 
-STATUS DE RISCO / FRAUDE: {{ empresa.risk_level }} (Score: {{ empresa.risk_score }}/100)
-Limite de Transação Sugerido: R$ {{ empresa.compliance_processos.limite_credito|floatformat:2 }}
-Recomendação de Crédito: {{ empresa.compliance_processos.recomendacao_credito }}
+Perfil Cadastral:
+- Atividade: {{ empresa.atividade_principal|default:"Atividades comerciais" }}
+- Porte: {{ empresa.porte|default:"N/D" }} | Capital Social: R$ {{ empresa.capital_social|floatformat:2 }}
+- Situação Receita: {{ empresa.situacao|default:"Ativa" }}
 
-PARECER DE SEGURANÇA PARA APROVAÇÃO:
-{{ empresa.compliance_processos.parecer_ia }}</textarea>
+Quadro Societário (QSA):
+{% if empresa.socios %}{% for socio in empresa.socios %}- {{ socio.nome }} ({% if socio.qualificacao_socio %}{{ socio.qualificacao_socio }}{% else %}Sócio{% endif %})
+{% endfor %}{% else %}- Não informado{% endif %}
+Resumo Jurídico e Compliance:
+- Risco / Score: {{ empresa.risk_level }} (Score: {{ empresa.risk_score }}/100)
+- Processos / Sanções: {% if empresa.compliance_processos.lista_processos %}⚠️ ENCONTRADOS REGISTROS ({% for proc in empresa.compliance_processos.lista_processos %}{{ proc.tipo }} - {{ proc.status }}{% if not forloop.last %}, {% endif %}{% endfor %}){% else %}Nenhum processo ou sanção federal ativa (Regular){% endif %}
+- Parecer Técnico: {{ empresa.compliance_processos.recomendacao_credito }}</textarea>
     </div>
 </div>
 
 <script>
+function atualizarMensagemPix() {
+    const valor = document.getElementById('inputValor').value.trim() || '[Informe o Valor]';
+    const nome = document.getElementById('inputOrigemNome').value.trim() || '[Nome da Origem]';
+    const cnpj = document.getElementById('inputOrigemCnpj').value.trim() || '[CNPJ Origem]';
+    const conta = document.getElementById('inputOrigemConta').value.trim() || '[Conta/Banco]';
+
+    const alertaRisco = `{% if empresa.risk_level == 'ALTO' or empresa.risk_level == 'MÉDIO' %}⚠️ ATENÇÃO: ANÁLISE DE RISCO {{ empresa.risk_level }} — REQUER DUPLA ALÇADA ⚠️\n\n{% endif %}`;
+
+    let texto = alertaRisco + `Por gentileza, aprovar a transação Pix:
+- Valor: R$ ${valor}
+- Pagador (Origem): ${nome} (CNPJ: ${cnpj}) — Conta: ${conta}
+
+Empresa Beneficiária (Destinatária):
+- Razão Social: {{ empresa.razao_social|default:"N/D" }}
+- Nome Fantasia: {{ empresa.nome_fantasia|default:"N/D" }}
+- CNPJ: {{ empresa.cnpj }}
+
+Perfil Cadastral:
+- Atividade: {{ empresa.atividade_principal|default:"Atividades comerciais" }}
+- Porte: {{ empresa.porte|default:"N/D" }} | Capital Social: R$ {{ empresa.capital_social|floatformat:2 }}
+- Situação Receita: {{ empresa.situacao|default:"Ativa" }}
+
+Quadro Societário (QSA):
+{% if empresa.socios %}{% for socio in empresa.socios %}- {{ socio.nome }} ({% if socio.qualificacao_socio %}{{ socio.qualificacao_socio }}{% else %}Sócio{% endif %})
+{% endfor %}{% else %}- Não informado{% endif %}
+Resumo Jurídico e Compliance:
+- Risco / Score: {{ empresa.risk_level }} (Score: {{ empresa.risk_score }}/100)
+- Processos / Sanções: {% if empresa.compliance_processos.lista_processos %}⚠️ ENCONTRADOS REGISTROS ({% for proc in empresa.compliance_processos.lista_processos %}{{ proc.tipo }} - {{ proc.status }}{% if not forloop.last %}, {% endif %}{% endfor %}){% else %}Nenhum processo ou sanção federal ativa (Regular){% endif %}
+- Parecer de Segurança: {{ empresa.compliance_processos.recomendacao_credito }}`;
+
+    document.getElementById('textoCopiaEquipe').value = texto;
+}
+
 function copiarTextoMensagem() {
     const textarea = document.getElementById('textoCopiaEquipe');
     textarea.select();
