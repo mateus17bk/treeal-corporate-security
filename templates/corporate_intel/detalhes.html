@@ -119,7 +119,7 @@ Quadro Societário (QSA):
 {% endfor %}{% else %}- Não informado{% endif %}
 Resumo Jurídico e Compliance:
 - Risco / Score: {{ empresa.risk_level }} (Score: {{ empresa.risk_score }}/100)
-- Processos / Sanções: {% if empresa.compliance_processos.lista_processos %}⚠️ ENCONTRADOS REGISTROS ({% for proc in empresa.compliance_processos.lista_processos %}{{ proc.tipo }} - {{ proc.status }}{% if not forloop.last %}, {% endif %}{% endfor %}){% else %}Nenhum processo ou sanção federal ativa (Regular){% endif %}
+- Processos / Dívidas: {% if empresa.compliance_processos.dividas and empresa.compliance_processos.dividas.tem_protesto %}⚠️ DÍVIDAS / PROTESTOS DETECTADOS (Total: R$ {{ empresa.compliance_processos.dividas.valor_total|floatformat:2 }}){% elif empresa.compliance_processos.lista_processos %}⚠️ PROCESSOS ATIVOS{% else %}Regular (Sem dívidas ou sanções federais){% endif %}
 - Parecer Técnico: {{ empresa.compliance_processos.recomendacao_credito }}</textarea>
     </div>
 </div>
@@ -152,7 +152,7 @@ Quadro Societário (QSA):
 {% endfor %}{% else %}- Não informado{% endif %}
 Resumo Jurídico e Compliance:
 - Risco / Score: {{ empresa.risk_level }} (Score: {{ empresa.risk_score }}/100)
-- Processos / Sanções: {% if empresa.compliance_processos.lista_processos %}⚠️ ENCONTRADOS REGISTROS ({% for proc in empresa.compliance_processos.lista_processos %}{{ proc.tipo }} - {{ proc.status }}{% if not forloop.last %}, {% endif %}{% endfor %}){% else %}Nenhum processo ou sanção federal ativa (Regular){% endif %}
+- Processos / Dívidas: {% if empresa.compliance_processos.dividas and empresa.compliance_processos.dividas.tem_protesto %}⚠️ DÍVIDAS / PROTESTOS DETECTADOS (Total: R$ {{ empresa.compliance_processos.dividas.valor_total|floatformat:2 }}){% elif empresa.compliance_processos.lista_processos %}⚠️ PROCESSOS ATIVOS{% else %}Regular (Sem dívidas ou sanções federais){% endif %}
 - Parecer de Segurança: {{ empresa.compliance_processos.recomendacao_credito }}`;
 
     document.getElementById('textoCopiaEquipe').value = texto;
