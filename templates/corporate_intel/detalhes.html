@@ -212,11 +212,29 @@ function copiarTextoMensagem() {
     <!-- Coluna 1 & 2: Processos Judiciais & QSA -->
     <div class="lg:col-span-2 space-y-8">
 
-        <!-- Compliance & Sanções CGU -->
+        <!-- Sanções & Dívidas / Protestos -->
         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-7 shadow-xl">
             <h3 class="text-lg font-bold text-white mb-4 flex items-center">
-                <i class="fa-solid fa-scale-balanced mr-2.5 text-amber-400"></i> Sanções (CGU) & Processos Oficiais
+                <i class="fa-solid fa-scale-balanced mr-2.5 text-amber-400"></i> Sanções (CGU), Processos & Dívidas / Protestos
             </h3>
+
+            {% if empresa.compliance_processos.dividas and empresa.compliance_processos.dividas.tem_protesto %}
+            <div class="mb-5 bg-amber-950/30 border border-amber-800/50 rounded-2xl p-5 text-amber-300 text-sm shadow-inner">
+                <div class="flex items-center space-x-3 mb-2">
+                    <i class="fa-solid fa-triangle-exclamation text-xl text-amber-400"></i>
+                    <h4 class="font-bold text-white">Atenção: Apontamentos Financeiros e Protestos Identificados</h4>
+                </div>
+                <p class="text-xs text-slate-300 mb-3">Valor total em aberto: <strong class="text-amber-400">R$ {{ empresa.compliance_processos.dividas.valor_total|floatformat:2 }}</strong></p>
+                <div class="space-y-2">
+                    {% for div in empresa.compliance_processos.dividas.lista_dividas %}
+                    <div class="bg-slate-950 p-3 rounded-xl border border-amber-500/20 text-xs flex justify-between items-center font-mono">
+                        <span class="text-white">{{ div.origem }} ({{ div.tipo }})</span>
+                        <span class="text-amber-400 font-bold">{{ div.valor }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
 
             {% if empresa.compliance_processos.lista_processos %}
             <div class="space-y-4">
